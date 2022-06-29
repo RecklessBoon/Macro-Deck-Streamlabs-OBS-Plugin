@@ -51,7 +51,6 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
                 PluginCache.Dispatcher = new MessageDispatcher(connection);
                 WireListeners();
                 connection.Start();
-                await InitVariablesAsync();
             }
         }
 
@@ -63,8 +62,9 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
                 case "ScenesService.sceneSwitched":
                     if (result["_type"].ToString() == "EVENT")
                     {
-                        var data = e.Message.Result["data"];
-                        VariableManager.SetValue("slobs_active_scene", data["name"].ToString(), VariableType.String, PluginCache.Plugin);
+                        var scene = result["data"].ToObject<Scene>();
+                        VariableManager.SetValue("slobs_active_scene_name", scene.Name, VariableType.String, PluginCache.Plugin);
+                        VariableManager.SetValue("slobs_active_scene_id", scene.Id, VariableType.String, PluginCache.Plugin);
                     }
                     break;
                 default:
@@ -104,25 +104,6 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
             }
 
             ClipListeners();
-        }
-
-        protected async Task InitVariablesAsync()
-        {
-            var dispatcher = PluginCache.Dispatcher;
-            if (dispatcher != null && dispatcher.Connection != null && dispatcher.Connection.IsDisposed == false)
-            {
-                var response = await dispatcher.SendMessageAsync(new JsonRpcRequest
-                {
-                    Method = "activeScene",
-                    Params = new
-                    {
-                        resource = "ScenesService"
-                    }
-                });
-
-                var scene = response.Result.ToObject<Scene>();
-                VariableManager.SetValue("slobs_active_scene", scene.Name, VariableType.String, PluginCache.Plugin);
-            }
         }
     }
 
