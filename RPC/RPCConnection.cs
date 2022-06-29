@@ -1,0 +1,230 @@
+﻿using Microsoft.VisualStudio.Threading;
+using Newtonsoft.Json;
+using System;
+using System.Buffers;
+using System.IO;
+using System.IO.Pipelines;
+using System.IO.Pipes;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
+{
+    public class MessageReceivedArgs : EventArgs
+    {
+        public JsonRpcResponse Message
+        {
+            get
+            {
+                try
+                {
+                    return JsonConvert.DeserializeObject<JsonRpcResponse>(RawMessage);
+                } catch (JsonSerializationException) 
+                {
+                    return null;
+                }
+            }
+        }
+
+        public string RawMessage { get; set; }
+    }
+
+    public class RPCConnection : IDisposable
+    {
+        public event EventHandler<MessageReceivedArgs> OnMessageReceived;
+        public event EventHandler OnDisposed;
+
+        protected CancellationTokenSource cts;
+
+        protected TaskCompletionSource<bool> _completionSource = default;
+        public Task Completion => _completionSource.Task;
+
+        protected PipeReader reader;
+        protected PipeWriter writer;
+
+        private bool _disposed = false;
+        public bool IsDisposed => _disposed;
+
+        private bool _started = false;
+        public bool IsStarted => _started;
+
+        public RPCConnection(PipeStream pipe) : this (PipeReader.Create(pipe), PipeWriter.Create(pipe)) { }
+
+        public RPCConnection(PipeReader reader, PipeWriter writer) : this()
+        {
+            this.reader = reader;
+            this.writer = writer;
+        }
+
+        protected RPCConnection()
+        {
+            this.cts = new CancellationTokenSource();
+            _completionSource = new TaskCompletionSource<bool>();
+        }
+
+        public void Start()
+        {
+            _started = true;
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await ProcessMessagesAsync(reader, writer, cts.Token);
+                }
+                catch (Exception ex)
+                {
+                    _completionSource.SetException(ex);
+                }
+                _completionSource.SetResult(true);
+
+            });
+        }
+
+        public void Write(object request) =>
+            Write(JsonConvert.SerializeObject(request));
+
+        public void Write(string message)
+        {
+            var factory = new JoinableTaskFactory(new JoinableTaskContext());
+            factory.Run(async () => { await WriteAsync(message); });
+        }
+
+        public async Task WriteAsync(object request) =>
+            await WriteAsync(JsonConvert.SerializeObject(request));
+
+        public async Task WriteAsync(string message)
+        {
+            await WriteMessagesAsync(writer, message);
+        }
+
+        public async Task<JsonRpcResponse> WriteAndAwaitAsync(JsonRpcRequest request)
+        {
+            var tcs = new TaskCompletionSource<JsonRpcResponse>();
+            await WriteAsync(request);
+            EventHandler<MessageReceivedArgs> Watcher = null;
+            Watcher = (object sender, MessageReceivedArgs args) =>
+            {
+                try
+                {
+                    var response = JsonConvert.DeserializeObject<JsonRpcResponse>(args.RawMessage);
+                    if (response.Id == request.Id)
+                    {
+                        tcs.SetResult(response);
+                    }
+                } 
+                catch (JsonSerializationException jse)
+                {
+                    Console.WriteLine("Weird serialization error: {0}", jse);
+                }
+                finally
+                {
+                    this.OnMessageReceived -= Watcher;
+                }
+            };
+            this.OnMessageReceived += Watcher;
+
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(30000);
+                if (!tcs.Task.IsCompleted)
+                {
+                    this.OnMessageReceived -= Watcher;
+                    tcs.SetException(new TimeoutException("No response given within 30 seconds. Abandonning watcher"));
+                }
+            });
+
+            return await tcs.Task;
+        }
+
+        async Task ProcessMessagesAsync(
+           PipeReader reader,
+            PipeWriter writer,
+            CancellationToken ct)
+        {
+            try
+            {
+                while (true && !ct.IsCancellationRequested)
+                {
+                    ReadResult readResult = await reader.ReadAsync();
+                    ReadOnlySequence<byte> buffer = readResult.Buffer;
+
+                    try
+                    {
+                        if (readResult.IsCanceled)
+                        {
+                            break;
+                        }
+
+                        if (TryParseLines(ref buffer, out string message))
+                        {
+                            if (message != null)
+                            {
+                                OnMessageReceived?.Invoke(this, new MessageReceivedArgs { RawMessage = message.Replace("\\n", "\n") });
+                            }
+                        }
+
+                        if (readResult.IsCompleted)
+                        {
+                            if (!buffer.IsEmpty)
+                            {
+                                throw new InvalidDataException("Incomplete message.");
+                            }
+                            break;
+                        }
+                    }
+                    finally
+                    {
+                        reader.AdvanceTo(buffer.Start, buffer.End);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                await Console.Error.WriteLineAsync(ex.ToString());
+            }
+            finally
+            {
+                await reader.CompleteAsync();
+                await writer.CompleteAsync();
+            }
+        }
+
+        static bool TryParseLines(
+            ref ReadOnlySequence<byte> buffer,
+            out string message)
+        {
+            SequencePosition? position;
+            StringBuilder outputMessage = new StringBuilder();
+
+            while (true)
+            {
+                position = buffer.PositionOf((byte)'\n');
+
+                if (!position.HasValue)
+                    break;
+
+                outputMessage.Append(Encoding.ASCII.GetString(buffer.Slice(buffer.Start, position.Value).ToArray()))
+                            .AppendLine();
+
+                buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
+            };
+
+            message = outputMessage.ToString();
+            return message.Length != 0;
+        }
+
+        static ValueTask<FlushResult> WriteMessagesAsync(
+            PipeWriter writer,
+            string message) =>
+            writer.WriteAsync(Encoding.ASCII.GetBytes(message));
+
+        public void Dispose()
+        {
+            cts.Cancel();
+
+            _disposed = true;
+            OnDisposed?.Invoke(this, EventArgs.Empty);
+        }
+    }
+}
