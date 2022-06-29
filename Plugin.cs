@@ -1,4 +1,5 @@
 ﻿using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions;
+using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Dialog;
 using SuchByte.MacroDeck.Plugins;
 using SuchByte.MacroDeck.Variables;
@@ -107,12 +108,11 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
 
         protected async Task InitVariablesAsync()
         {
-            RPCConnection client = PluginCache.Connection;
-            /*if (client != null && !client.IsDisposed && client.IsStarted)
+            var dispatcher = PluginCache.Dispatcher;
+            if (dispatcher != null && dispatcher.Connection != null && dispatcher.Connection.IsDisposed == false)
             {
-                var response = await client.WriteAndAwaitAsync(new JsonRpcRequest
+                var response = await dispatcher.SendMessageAsync(new JsonRpcRequest
                 {
-                    Id = (_requestCounter++).ToString(),
                     Method = "activeScene",
                     Params = new
                     {
@@ -122,7 +122,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
 
                 var scene = response.Result.ToObject<Scene>();
                 VariableManager.SetValue("slobs_active_scene", scene.Name, VariableType.String, PluginCache.Plugin);
-            }*/
+            }
         }
     }
 

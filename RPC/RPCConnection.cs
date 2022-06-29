@@ -36,9 +36,11 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
         public event EventHandler OnDisposed;
 
         protected CancellationTokenSource cts;
-
         protected TaskCompletionSource<bool> _completionSource = default;
         public Task Completion => _completionSource.Task;
+
+        protected JoinableTaskContext _joinableTaskContext = new JoinableTaskContext();
+        protected JoinableTaskFactory _joinableTaskFactory;
 
         protected PipeReader reader;
         protected PipeWriter writer;
@@ -59,6 +61,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
 
         protected RPCConnection()
         {
+            _joinableTaskFactory = new JoinableTaskFactory(_joinableTaskContext);
             this.cts = new CancellationTokenSource();
             _completionSource = new TaskCompletionSource<bool>();
         }
@@ -81,27 +84,14 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
             });
         }
 
-        public void Write(object request) =>
-            Write(JsonConvert.SerializeObject(request));
+        public void Notify(JsonRpcRequest request) => _joinableTaskFactory.Run(async () => await NotifyAsync(request));
 
-        public void Write(string message)
-        {
-            var factory = new JoinableTaskFactory(new JoinableTaskContext());
-            factory.Run(async () => { await WriteAsync(message); });
-        }
+        public async Task NotifyAsync(JsonRpcRequest request) => await WriteMessagesAsync(writer, request.ToString());
 
-        public async Task WriteAsync(object request) =>
-            await WriteAsync(JsonConvert.SerializeObject(request));
-
-        public async Task WriteAsync(string message)
-        {
-            await WriteMessagesAsync(writer, message);
-        }
-
-        public async Task<JsonRpcResponse> WriteAndAwaitAsync(JsonRpcRequest request)
+        public async Task<JsonRpcResponse> WriteAsync(JsonRpcRequest request)
         {
             var tcs = new TaskCompletionSource<JsonRpcResponse>();
-            await WriteAsync(request);
+            await NotifyAsync(request);
             EventHandler<MessageReceivedArgs> Watcher = null;
             Watcher = (object sender, MessageReceivedArgs args) =>
             {
@@ -156,11 +146,15 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
                             break;
                         }
 
-                        if (TryParseLines(ref buffer, out string message))
+                        if (TryParseLines(ref buffer, out string response))
                         {
-                            if (message != null)
+                            if (response != null)
                             {
-                                OnMessageReceived?.Invoke(this, new MessageReceivedArgs { RawMessage = message.Replace("\\n", "\n") });
+                                foreach (var message in response.Split('\n'))
+                                {
+                                    if (message == "") continue;
+                                    OnMessageReceived?.Invoke(this, new MessageReceivedArgs { RawMessage = message.Replace("\\n", "\n") });
+                                }
                             }
                         }
 

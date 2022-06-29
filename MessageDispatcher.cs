@@ -41,7 +41,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
         public async Task<JsonRpcResponse> SendMessageAsync(JsonRpcRequest request)
         {
             request.Id ??= (_requestCount++).ToString();
-            return await _connection.WriteAndAwaitAsync(request);
+            return await _connection.WriteAsync(request);
         }
 
         private void DispatchMessage(object sender, MessageReceivedArgs e)
