@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
+namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC
 {
 
     public class JsonRpcRequest

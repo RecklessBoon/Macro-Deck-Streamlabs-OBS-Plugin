@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
+namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC
 {
     public class MessageReceivedArgs : EventArgs
     {

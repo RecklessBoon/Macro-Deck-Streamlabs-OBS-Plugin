@@ -1,6 +1,9 @@
 ﻿using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model;
+using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC;
+using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Dialog;
+using Streamlabs_OBS_Plugin.Services;
 using SuchByte.MacroDeck.Plugins;
 using SuchByte.MacroDeck.Variables;
 using System;
@@ -45,55 +48,39 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
                 await pipe.ConnectAsync();
                 PluginCache.Pipe = pipe;
                 var connection = new RPCConnection(pipe);
-                connection.OnMessageReceived += OnMessageReceived;
+                var dispatcher = new MessageDispatcher(connection);
                 connection.OnDisposed += OnConnectionDisposed;
                 PluginCache.Connection = connection;
                 PluginCache.Dispatcher = new MessageDispatcher(connection);
-                WireListeners();
+                PluginCache.ScenesService = new ScenesService();
+                PluginCache.SceneCollectionsService = new SceneCollectionsService();
                 connection.Start();
-            }
-        }
-
-        private void OnMessageReceived(object sender, MessageReceivedArgs e)
-        {
-            var result = e.Message.Result;
-            switch (result["resourceId"].ToString())
-            {
-                case "ScenesService.sceneSwitched":
-                    if (result["_type"].ToString() == "EVENT")
-                    {
-                        var scene = result["data"].ToObject<Scene>();
-                        VariableManager.SetValue("slobs_active_scene_name", scene.Name, VariableType.String, PluginCache.Plugin);
-                        VariableManager.SetValue("slobs_active_scene_id", scene.Id, VariableType.String, PluginCache.Plugin);
-                    }
-                    break;
-                default:
-                    break;
+                WireListeners();
             }
         }
 
         protected void WireListeners()
         {
-            _ = PluginCache.Dispatcher.SendMessageAsync(new JsonRpcRequest
-            {
-                Method = "sceneSwitched",
-                Params = new
-                {
-                    resource = "ScenesService"
-                }
-            });
+            PluginCache.ScenesService.OnSceneSwitched += OnSceneSwitched;
+            PluginCache.SceneCollectionsService.OnCollectionSwitched += OnCollectionSwitched;
         }
 
         protected void ClipListeners()
         {
-            _ = PluginCache.Dispatcher.SendMessageAsync(new JsonRpcRequest
-            {
-                Method = "unsubscribe",
-                Params = new
-                {
-                    resource = "ScneseService.sceneSwitched"
-                }
-            });
+            PluginCache.ScenesService.OnSceneSwitched -= OnSceneSwitched;
+            PluginCache.SceneCollectionsService.OnCollectionSwitched -= OnCollectionSwitched;
+        }
+
+        protected void OnSceneSwitched(object sender, ISceneModel scene)
+        {
+            VariableManager.SetValue("slobs_active_scene_name", scene.Name, VariableType.String, PluginCache.Plugin);
+            VariableManager.SetValue("slobs_active_scene_id", scene.Id, VariableType.String, PluginCache.Plugin);
+        }
+
+        protected void OnCollectionSwitched(object sender, SceneCollectionsManifestEntry collection)
+        {
+            VariableManager.SetValue("slobs_active_scene_collection_name", collection.Name, VariableType.String, PluginCache.Plugin);
+            VariableManager.SetValue("slobs_active_scene_collection_id", collection.Id, VariableType.String, PluginCache.Plugin);
         }
 
         protected void OnConnectionDisposed(object sender, EventArgs args)
@@ -113,5 +100,8 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
         public static NamedPipeClientStream Pipe { get; set; }
         public static RPCConnection Connection { get; set; }
         public static MessageDispatcher Dispatcher { get; set; }
+
+        public static ScenesService ScenesService { get; set; }
+        public static SceneCollectionsService SceneCollectionsService { get; set; }
     }
 }

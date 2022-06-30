@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
+namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC
 {
     public class JsonRpcResponse
     {
@@ -9,7 +9,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
         public string JsonRpc { get; set; }
 
         [JsonProperty("result")]
-        public JToken Result { get; set; }
+        public RPCResult Result { get; set; }
 
         [JsonProperty("error")]
         public JsonRpcError Error { get; set; }

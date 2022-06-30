@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.Threading;
 using Newtonsoft.Json;
+using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -33,15 +34,73 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
             _connection.OnMessageReceived += DispatchMessage;
         }
 
-        public JsonRpcResponse SendMessage(JsonRpcRequest request)
+        public void Notify(JsonRpcRequest request) => _joinableTaskFactory.Run(async () => await NotifyAsync(request));
+
+        public async Task NotifyAsync(JsonRpcRequest request)
         {
-            return _joinableTaskFactory.Run(async () => await SendMessageAsync(request));
+            request.Id ??= (_requestCount++).ToString();
+            await _connection.NotifyAsync(request);
         }
 
-        public async Task<JsonRpcResponse> SendMessageAsync(JsonRpcRequest request)
+        public JsonRpcResponse Write(JsonRpcRequest request) => _joinableTaskFactory.Run(async () => await WriteAsync(request));
+
+        public async Task<JsonRpcResponse> WriteAsync(JsonRpcRequest request)
         {
             request.Id ??= (_requestCount++).ToString();
             return await _connection.WriteAsync(request);
+        }
+
+        protected Dictionary<string, List<EventHandler<MessageDispatchedArgs>>> handlers = new Dictionary<string, List<EventHandler<MessageDispatchedArgs>>>();
+        public void Subscribe<T>(string event_service, string event_name, EventHandler<T> callback)
+        {
+            var emitter = String.Format("{0}.{1}", event_service, event_name);
+            if (!handlers.ContainsKey(emitter))
+            {
+                PluginCache.Dispatcher.Notify(new JsonRpcRequest
+                {
+                    Method = event_name,
+                    Params = new
+                    {
+                        resource = event_service
+                    }
+                });
+
+                handlers.Add(emitter, new List<EventHandler<MessageDispatchedArgs>>());
+            }
+
+            EventHandler<MessageDispatchedArgs> handler = delegate (object sender, MessageDispatchedArgs e)
+            {
+                var result = e.Response.Result;
+                if (result.ResourceId == emitter)
+                {
+                    var obj = result.Data.ToObject<T>();
+                    callback?.Invoke(this, obj);
+                }
+            };
+            handlers[emitter].Add(handler);
+            PluginCache.Dispatcher.OnEventDispatched -= handler;
+            PluginCache.Dispatcher.OnEventDispatched += handler;
+        }
+
+        public void Unsubscribe(string event_service, string event_name)
+        {
+            var emitter = String.Format("{0}.{1}", event_service, event_name);
+
+            var handler_list = handlers[emitter];
+            foreach (var handler in handler_list)
+            {
+                PluginCache.Dispatcher.OnEventDispatched -= handler;
+            }
+
+            handlers.Remove(emitter);
+            PluginCache.Dispatcher.Notify(new JsonRpcRequest
+            {
+                Method = "unsubscribe",
+                Params = new
+                {
+                    resource = emitter
+                }
+            });
         }
 
         private void DispatchMessage(object sender, MessageReceivedArgs e)

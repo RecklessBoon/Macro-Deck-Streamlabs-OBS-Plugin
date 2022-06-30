@@ -1,17 +1,24 @@
-﻿using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model;
-using StreamJsonRpc;
+﻿using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin;
+using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model;
+using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Streamlabs_OBS_Plugin.Services
 {
     public class ScenesService
     {
-        public static Task<Scene[]> GetScenesAsync(JsonRpc client)
+        public event EventHandler<Scene> OnSceneSwitched
         {
-            return client.InvokeWithParameterObjectAsync<Scene[]>("getScenes", new { resource = "ScenesService" });
+            add
+            {
+                PluginCache.Dispatcher.Subscribe<Scene>("ScenesService", "sceneSwitched", value);
+            }
+            remove 
+            {
+                PluginCache.Dispatcher.Unsubscribe("ScenesService", "sceneSwitched");
+            }
         }
     }
 }
