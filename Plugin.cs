@@ -9,6 +9,7 @@ using SuchByte.MacroDeck.Variables;
 using System;
 using System.Collections.Generic;
 using System.IO.Pipes;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
@@ -56,31 +57,36 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
                 PluginCache.SceneCollectionsService = new SceneCollectionsService();
                 connection.Start();
                 WireListeners();
+                _ = Task.Run(async () => {
+                    var scenes = await PluginCache.ScenesService.GetScenesAsync();
+                    List<SceneItemFolder> folders = new List<SceneItemFolder>(await scenes[0].GetFoldersAsync());
+                    Console.WriteLine("Folders: {0}", String.Join(", ", folders));
+                });
             }
         }
 
         protected void WireListeners()
         {
-            PluginCache.ScenesService.OnSceneSwitched += OnSceneSwitched;
-            PluginCache.SceneCollectionsService.OnCollectionSwitched += OnCollectionSwitched;
+            PluginCache.ScenesService.SceneSwitched += OnSceneSwitched;
+            PluginCache.SceneCollectionsService.CollectionSwitched += OnCollectionSwitched;
         }
 
         protected void ClipListeners()
         {
-            PluginCache.ScenesService.OnSceneSwitched -= OnSceneSwitched;
-            PluginCache.SceneCollectionsService.OnCollectionSwitched -= OnCollectionSwitched;
+            PluginCache.ScenesService.SceneSwitched -= OnSceneSwitched;
+            PluginCache.SceneCollectionsService.CollectionSwitched -= OnCollectionSwitched;
         }
 
         protected void OnSceneSwitched(object sender, ISceneModel scene)
         {
-            VariableManager.SetValue("slobs_active_scene_name", scene.Name, VariableType.String, PluginCache.Plugin);
-            VariableManager.SetValue("slobs_active_scene_id", scene.Id, VariableType.String, PluginCache.Plugin);
+            VariableManager.SetValue("slobs_active_scene_name", scene.Name, VariableType.String, PluginCache.Plugin, null);
+            VariableManager.SetValue("slobs_active_scene_id", scene.Id, VariableType.String, PluginCache.Plugin, null);
         }
 
         protected void OnCollectionSwitched(object sender, SceneCollectionsManifestEntry collection)
         {
-            VariableManager.SetValue("slobs_active_scene_collection_name", collection.Name, VariableType.String, PluginCache.Plugin);
-            VariableManager.SetValue("slobs_active_scene_collection_id", collection.Id, VariableType.String, PluginCache.Plugin);
+            VariableManager.SetValue("slobs_active_scene_collection_name", collection.Name, VariableType.String, PluginCache.Plugin, null);
+            VariableManager.SetValue("slobs_active_scene_collection_id", collection.Id, VariableType.String, PluginCache.Plugin, null);
         }
 
         protected void OnConnectionDisposed(object sender, EventArgs args)

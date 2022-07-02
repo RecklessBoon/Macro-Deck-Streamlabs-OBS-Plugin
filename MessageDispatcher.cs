@@ -70,7 +70,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
 
             EventHandler<MessageDispatchedArgs> handler = delegate (object sender, MessageDispatchedArgs e)
             {
-                var result = e.Response.Result;
+                var result = e.Response.Result.ToObject<RPCResult>();
                 if (result.ResourceId == emitter)
                 {
                     var obj = result.Data.ToObject<T>();

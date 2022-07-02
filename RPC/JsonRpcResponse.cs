@@ -9,7 +9,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC
         public string JsonRpc { get; set; }
 
         [JsonProperty("result")]
-        public RPCResult Result { get; set; }
+        public JToken Result { get; set; }
 
         [JsonProperty("error")]
         public JsonRpcError Error { get; set; }
@@ -22,7 +22,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC
 
         public override string ToString()
         {
-            return JsonConvert.SerializeObject(this, Formatting.Indented);
+            return JsonConvert.SerializeObject(this);
         }
     }
 }

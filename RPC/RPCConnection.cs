@@ -91,6 +91,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC
         public async Task<JsonRpcResponse> WriteAsync(JsonRpcRequest request)
         {
             var tcs = new TaskCompletionSource<JsonRpcResponse>();
+            AppLogger.Trace("Message being sent:\n{0}", request);
             await NotifyAsync(request);
             EventHandler<MessageReceivedArgs> Watcher = null;
             Watcher = (object sender, MessageReceivedArgs args) =>
@@ -101,14 +102,12 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC
                     if (response.Id == request.Id)
                     {
                         tcs.SetResult(response);
+                        this.OnMessageReceived -= Watcher;
                     }
                 } 
-                catch (JsonSerializationException jse)
+                catch (Exception jse)
                 {
                     Console.WriteLine("Weird serialization error: {0}", jse);
-                }
-                finally
-                {
                     this.OnMessageReceived -= Watcher;
                 }
             };
@@ -150,7 +149,8 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC
                         {
                             if (response != null)
                             {
-                                foreach (var message in response.Split('\n'))
+                                AppLogger.Trace("Message received:\n{0}", response);
+                                foreach (var message in response.Split("\r\n"))
                                 {
                                     if (message == "") continue;
                                     OnMessageReceived?.Invoke(this, new MessageReceivedArgs { RawMessage = message.Replace("\\n", "\n") });
