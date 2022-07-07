@@ -1,11 +1,8 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model
 {
-    public interface ITransform
+    public class PartialTransform : IPartialTransform
     {
         [JsonProperty("crop")]
         public Crop Crop { get; set; }

@@ -51,6 +51,37 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
         }
 
         protected Dictionary<string, List<EventHandler<MessageDispatchedArgs>>> handlers = new Dictionary<string, List<EventHandler<MessageDispatchedArgs>>>();
+
+        public void Subscribe(string event_service, string event_name, EventHandler callback)
+        {
+            var emitter = String.Format("{0}.{1}", event_service, event_name);
+            if (!handlers.ContainsKey(emitter))
+            {
+                PluginCache.Dispatcher.Notify(new JsonRpcRequest
+                {
+                    Method = event_name,
+                    Params = new
+                    {
+                        resource = event_service
+                    }
+                });
+
+                handlers.Add(emitter, new List<EventHandler<MessageDispatchedArgs>>());
+            }
+
+            EventHandler<MessageDispatchedArgs> handler = delegate (object sender, MessageDispatchedArgs e)
+            {
+                var result = e.Response.Result.ToObject<RPCResult>();
+                if (result.ResourceId == emitter)
+                {
+                    callback?.Invoke(this, EventArgs.Empty);
+                }
+            };
+            handlers[emitter].Add(handler);
+            PluginCache.Dispatcher.OnEventDispatched -= handler;
+            PluginCache.Dispatcher.OnEventDispatched += handler;
+        }
+
         public void Subscribe<T>(string event_service, string event_name, EventHandler<T> callback)
         {
             var emitter = String.Format("{0}.{1}", event_service, event_name);

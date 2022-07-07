@@ -73,6 +73,16 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
             return default;
         }
 
+        protected void AddSubscriber(EventHandler handler, [CallerMemberName] string propertyName = "")
+        {
+            PluginCache.Dispatcher.Subscribe(this.GetType().Name, FromPascalToCamelCase(propertyName), handler);
+        }
+
+        protected void RemoveSubscriber(EventHandler handler, [CallerMemberName] string propertyName = "")
+        {
+            PluginCache.Dispatcher.Unsubscribe(this.GetType().Name, FromPascalToCamelCase(propertyName));
+        }
+
         protected void AddSubscriber<T>(EventHandler<T> handler, [CallerMemberName] string propertyName = "")
         {
             PluginCache.Dispatcher.Subscribe(this.GetType().Name, FromPascalToCamelCase(propertyName), handler);
