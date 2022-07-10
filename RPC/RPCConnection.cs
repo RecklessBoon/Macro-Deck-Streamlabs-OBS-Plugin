@@ -211,7 +211,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC
         static ValueTask<FlushResult> WriteMessagesAsync(
             PipeWriter writer,
             string message) =>
-            writer.WriteAsync(Encoding.ASCII.GetBytes(message));
+            writer.WriteAsync(Encoding.ASCII.GetBytes(String.Format("{0}\n", message)));
 
         public void Dispose()
         {

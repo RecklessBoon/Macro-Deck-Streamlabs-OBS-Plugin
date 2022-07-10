@@ -18,6 +18,6 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC
         public string Emitter { get; set; }
 
         [JsonProperty("data")]
-        public JObject Data { get; set; }
+        public JToken Data { get; set; }
     }
 }

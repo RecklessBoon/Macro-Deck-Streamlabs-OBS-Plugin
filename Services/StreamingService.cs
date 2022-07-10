@@ -8,9 +8,9 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
 {
     public class StreamingService : BaseService
     {
-        public event EventHandler<ERecordingState> RecordingStatusChanged { add => AddSubscriber(value); remove => RemoveSubscriber(value); }
-        public event EventHandler<EReplayBufferState> ReplayBufferStatusChanged { add => AddSubscriber(value); remove => RemoveSubscriber(value); }
-        public event EventHandler<EStreamingState> StreamingStatusChanged { add => AddSubscriber(value); remove => RemoveSubscriber(value); }
+        public event EventHandler<ERecordingState> RecordingStatusChange { add => AddSubscriber(value); remove => RemoveSubscriber(value); }
+        public event EventHandler<EReplayBufferState> ReplayBufferStatusChange { add => AddSubscriber(value); remove => RemoveSubscriber(value); }
+        public event EventHandler<EStreamingState> StreamingStatusChange { add => AddSubscriber(value); remove => RemoveSubscriber(value); }
 
         public async Task<StreamingState> GetModelAsync() => await MakeCallAsync<StreamingState>(this.GetType().Name);
         public async Task SaveReplayAsync() => await MakeCallAsync(this.GetType().Name);

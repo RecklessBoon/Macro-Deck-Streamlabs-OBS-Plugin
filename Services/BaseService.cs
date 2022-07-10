@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC;
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -22,10 +23,27 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
 
             if (args != null)
             {
+                var string_args = new List<string>();
+                foreach(var arg in args)
+                {
+                    foreach (var property in arg.GetType().GetProperties())
+                    {
+                        var val = property.GetValue(arg);
+                        if (val.GetType() == typeof(object)) 
+                        {
+                            string_args.Add(JsonConvert.SerializeObject(property.GetValue(arg)));
+                        }
+                        else
+                        {
+                            string_args.Add(val.ToString());
+                        }
+                    }
+                }
+
                 param_args = new
                 {
                     resource,
-                    args
+                    args = string_args
                 };
             }
 
@@ -47,10 +65,27 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
 
             if (args != null)
             {
+                var string_args = new List<string>();
+                foreach (var arg in args)
+                {
+                    foreach (var property in arg.GetType().GetProperties())
+                    {
+                        var val = property.GetValue(arg);
+                        if (val.GetType() == typeof(object))
+                        {
+                            string_args.Add(JsonConvert.SerializeObject(property.GetValue(arg)));
+                        }
+                        else
+                        {
+                            string_args.Add(val.ToString());
+                        }
+                    }
+                }
+
                 param_args = new
                 {
                     resource,
-                    args
+                    args = string_args
                 };
             };
 
@@ -61,16 +96,48 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
             });
 
             var result = response.Result;
-            if (result.Type == JTokenType.Object)
-            {
-                return result.ToObject<RPCResult>().Data.ToObject<T>();
-            } else if (result.Type == JTokenType.Array)
+            if (result.Type == JTokenType.Array)
             {
                 return result.ToObject<T>();
             }
+            else if (result.Type == JTokenType.Object)
+            {
+                if (result["data"] != null)
+                {
+                    return result.ToObject<RPCResult>().Data.ToObject<T>();
+                } 
+                else if (result["emitter"]?.ToString() == "PROMISE")
+                {
+                    var resourceId = result["resourceId"].ToString();
+                    EventHandler<MessageDispatchedArgs> handler;
+                    TaskCompletionSource<T> tcs = new TaskCompletionSource<T>();
+                    handler = (object sender, MessageDispatchedArgs args) => 
+                    {
+                        var response = args.Response;
+                        if (response.Result["emitter"]?.ToString() == "PROMISE" && response.Result["resourceId"]?.ToString() == resourceId)
+                        {
+                            if (response.Result["data"] != null) {
+                                tcs.SetResult(response.Result["data"].ToObject<T>());
+                            } else
+                            {
+                                AppLogger.Error("Failed to resolve promise appropriately:\n{0}", response);
+                                tcs.SetCanceled();
+                            }
+                        }
+                    };
 
-            AppLogger.Error("Unexpected response type received: {0}", response);
-            return default;
+                    PluginCache.Dispatcher.OnEventDispatched += handler;
+                    return await tcs.Task;
+                }
+                else
+                {
+                    return result.ToObject<T>();
+                }
+            }
+            else
+            {
+                return result.ToObject<T>();
+            }
         }
 
         protected void AddSubscriber(EventHandler handler, [CallerMemberName] string propertyName = "")

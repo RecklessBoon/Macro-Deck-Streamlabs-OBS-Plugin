@@ -4,7 +4,7 @@
     {
         string Id { get; set; }
         string Name { get; set; }
-        object[] Scenes { get; set; }
-        object[] Sources { get; set; }
+        Scene[] Scenes { get; set; }
+        Source[] Sources { get; set; }
     }
 }

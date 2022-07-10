@@ -1,4 +1,5 @@
-﻿using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions;
+﻿using Newtonsoft.Json.Converters;
+using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services;
@@ -29,7 +30,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
             _ = InitClientAsync();
 
             this.Actions = new List<PluginAction> {
-                new FirstAction()
+                new SwitchSceneAction()
             };
         }
 
@@ -55,12 +56,17 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
                 PluginCache.Dispatcher = new MessageDispatcher(connection);
                 PluginCache.ScenesService = new ScenesService();
                 PluginCache.SceneCollectionsService = new SceneCollectionsService();
+                PluginCache.StreamingService = new StreamingService();
                 connection.Start();
                 WireListeners();
-                _ = Task.Run(async () => {
-                    var scenes = await PluginCache.ScenesService.GetScenesAsync();
-                    List<SceneItemFolder> folders = new List<SceneItemFolder>(await scenes[0].GetFoldersAsync());
-                    Console.WriteLine("Folders: {0}", String.Join(", ", folders));
+                _ = Task.Run(async () =>
+                {
+                    var collection = await PluginCache.SceneCollectionsService.ActiveCollectionAsync();
+                    OnCollectionSwitched(this, collection);
+                });
+                _ = Task.Run(async () =>
+                {
+                    PluginCache.CollectionSchemas = await PluginCache.SceneCollectionsService.FetchSceneCollectionsSchemaAsync();
                 });
             }
         }
@@ -69,12 +75,33 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
         {
             PluginCache.ScenesService.SceneSwitched += OnSceneSwitched;
             PluginCache.SceneCollectionsService.CollectionSwitched += OnCollectionSwitched;
+            PluginCache.StreamingService.StreamingStatusChange += OnStreamingStatusChanged;
+            PluginCache.StreamingService.RecordingStatusChange += OnRecordingStatusChanged;
+            PluginCache.StreamingService.ReplayBufferStatusChange += OnReplayBufferStatusChanged;
         }
 
         protected void ClipListeners()
         {
             PluginCache.ScenesService.SceneSwitched -= OnSceneSwitched;
             PluginCache.SceneCollectionsService.CollectionSwitched -= OnCollectionSwitched;
+            PluginCache.StreamingService.StreamingStatusChange -= OnStreamingStatusChanged;
+            PluginCache.StreamingService.RecordingStatusChange -= OnRecordingStatusChanged;
+            PluginCache.StreamingService.ReplayBufferStatusChange -= OnReplayBufferStatusChanged;
+        }
+
+        private void OnReplayBufferStatusChanged(object sender, EReplayBufferState state)
+        {
+            VariableManager.SetValue("slobs_replay_buffer_status", state, VariableType.String, PluginCache.Plugin, null);
+        }
+
+        private void OnRecordingStatusChanged(object sender, ERecordingState state)
+        {
+            VariableManager.SetValue("slobs_recording_status", state, VariableType.String, PluginCache.Plugin, null);
+        }
+
+        private void OnStreamingStatusChanged(object sender, EStreamingState state)
+        {
+            VariableManager.SetValue("slobs_streaming_status", state, VariableType.String, PluginCache.Plugin, null);
         }
 
         protected void OnSceneSwitched(object sender, ISceneModel scene)
@@ -87,6 +114,10 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
         {
             VariableManager.SetValue("slobs_active_scene_collection_name", collection.Name, VariableType.String, PluginCache.Plugin, null);
             VariableManager.SetValue("slobs_active_scene_collection_id", collection.Id, VariableType.String, PluginCache.Plugin, null);
+            _ = Task.Run(async () => {
+                var scene = await PluginCache.ScenesService.ActiveSceneAsync();
+                OnSceneSwitched(this, scene);
+            });
         }
 
         protected void OnConnectionDisposed(object sender, EventArgs args)
@@ -109,5 +140,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
 
         public static ScenesService ScenesService { get; set; }
         public static SceneCollectionsService SceneCollectionsService { get; set; }
+        public static StreamingService StreamingService { get; set; }
+        public static SceneCollectionSchema[] CollectionSchemas { get; set; }
     }
 }

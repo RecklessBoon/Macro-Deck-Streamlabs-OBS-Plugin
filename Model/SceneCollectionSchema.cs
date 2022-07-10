@@ -14,10 +14,10 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model
         public string Name { get; set; }
 
         [JsonProperty("scenes")]
-        public object[] Scenes { get; set; }
+        public Scene[] Scenes { get; set; }
 
         [JsonProperty("sources")]
-        public object[] Sources { get; set; }
+        public Source[] Sources { get; set; }
 
     }
 }
