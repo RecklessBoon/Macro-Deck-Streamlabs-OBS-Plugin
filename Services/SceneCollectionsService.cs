@@ -18,7 +18,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
         public async Task<SceneCollectionsManifestEntry> CreateAsync(SceneCollectionCreateOptions options) => await MakeCallAsync<SceneCollectionsManifestEntry>(this.GetType().Name, new { options });
         public async Task DeleteAsync(string id) => await MakeCallAsync(this.GetType().Name, new { id });
         public async Task<SceneCollectionSchema[]> FetchSceneCollectionsSchemaAsync() => await MakeCallAsync<SceneCollectionSchema[]>(this.GetType().Name);
-        public async Task LoadAsync() => await MakeCallAsync(this.GetType().Name);
+        public async Task LoadAsync(string id) => await MakeCallAsync(this.GetType().Name, new { id });
         public async Task RenameAsync(string newName, string id) => await MakeCallAsync(this.GetType().Name, new { newName, id });
     }
 }

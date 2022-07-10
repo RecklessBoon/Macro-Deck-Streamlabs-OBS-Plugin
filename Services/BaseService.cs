@@ -23,27 +23,10 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
 
             if (args != null)
             {
-                var string_args = new List<string>();
-                foreach(var arg in args)
-                {
-                    foreach (var property in arg.GetType().GetProperties())
-                    {
-                        var val = property.GetValue(arg);
-                        if (val.GetType() == typeof(object)) 
-                        {
-                            string_args.Add(JsonConvert.SerializeObject(property.GetValue(arg)));
-                        }
-                        else
-                        {
-                            string_args.Add(val.ToString());
-                        }
-                    }
-                }
-
                 param_args = new
                 {
                     resource,
-                    args = string_args
+                    args = ObjectArrayToStringArray(args)
                 };
             }
 
@@ -65,27 +48,10 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
 
             if (args != null)
             {
-                var string_args = new List<string>();
-                foreach (var arg in args)
-                {
-                    foreach (var property in arg.GetType().GetProperties())
-                    {
-                        var val = property.GetValue(arg);
-                        if (val.GetType() == typeof(object))
-                        {
-                            string_args.Add(JsonConvert.SerializeObject(property.GetValue(arg)));
-                        }
-                        else
-                        {
-                            string_args.Add(val.ToString());
-                        }
-                    }
-                }
-
                 param_args = new
                 {
                     resource,
-                    args = string_args
+                    args = ObjectArrayToStringArray(args)
                 };
             };
 
@@ -105,20 +71,22 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
                 if (result["data"] != null)
                 {
                     return result.ToObject<RPCResult>().Data.ToObject<T>();
-                } 
+                }
                 else if (result["emitter"]?.ToString() == "PROMISE")
                 {
                     var resourceId = result["resourceId"].ToString();
                     EventHandler<MessageDispatchedArgs> handler;
                     TaskCompletionSource<T> tcs = new TaskCompletionSource<T>();
-                    handler = (object sender, MessageDispatchedArgs args) => 
+                    handler = (object sender, MessageDispatchedArgs args) =>
                     {
                         var response = args.Response;
                         if (response.Result["emitter"]?.ToString() == "PROMISE" && response.Result["resourceId"]?.ToString() == resourceId)
                         {
-                            if (response.Result["data"] != null) {
+                            if (response.Result["data"] != null)
+                            {
                                 tcs.SetResult(response.Result["data"].ToObject<T>());
-                            } else
+                            }
+                            else
                             {
                                 AppLogger.Error("Failed to resolve promise appropriately:\n{0}", response);
                                 tcs.SetCanceled();
@@ -138,6 +106,27 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
             {
                 return result.ToObject<T>();
             }
+        }
+
+        private static string[] ObjectArrayToStringArray(object[] args)
+        {
+            var string_args = new List<string>();
+            foreach (var arg in args)
+            {
+                foreach (var property in arg.GetType().GetProperties())
+                {
+                    var val = property.GetValue(arg);
+                    if (val.GetType() == typeof(object))
+                    {
+                        string_args.Add(JsonConvert.SerializeObject(property.GetValue(arg)));
+                    }
+                    else
+                    {
+                        string_args.Add(val.ToString());
+                    }
+                }
+            }
+            return string_args.ToArray();
         }
 
         protected void AddSubscriber(EventHandler handler, [CallerMemberName] string propertyName = "")

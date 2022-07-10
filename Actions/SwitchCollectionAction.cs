@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls;
 using Streamlabs_OBS_Plugin.Services;
 using SuchByte.MacroDeck.ActionButton;
@@ -9,18 +10,18 @@ using System.Threading.Tasks;
 
 namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
 {
-    public class SwitchSceneActionConfig
+    public class SwitchCollectionActionConfig
     {
-        public string SceneId { get; set; }
+        public string CollectionId { get; set; }
     }
 
-    public class SwitchSceneAction : PluginAction
+    public class SwitchCollectionAction : PluginAction
     {
         // The name of the action
-        public override string Name => "Switch Scene";
+        public override string Name => "Switch Scene Collection";
 
         // A short description what the action can do
-        public override string Description => "Switch scene within the current site collection";
+        public override string Description => "Switch to a specific Scene Collection";
 
         // Optional; Add if this action can be configured. This will make the ActionConfigurator calling GetActionConfigurator();
         public override bool CanConfigure => true;
@@ -28,18 +29,18 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
         // Optional; Add if you added CanConfigure; Gets called when the action can be configured and the action got selected in the ActionSelector. You need to return a user control with the "ActionConfigControl" class as base class
         public override ActionConfigControl GetActionConfigControl(ActionConfigurator actionConfigurator)
         {
-            return new SwitchSceneActionConfigurator(this, actionConfigurator);
+            return new SwitchCollectionActionConfigurator(this, actionConfigurator);
         }
 
         // Gets called when the action is triggered by a button press or an event
         public override void Trigger(string clientId, ActionButton actionButton)
         {
-            if (PluginCache.ScenesService.GetType() != typeof(ScenesService)) return;
+            if (PluginCache.SceneCollectionsService.GetType() != typeof(SceneCollectionsService)) return;
 
-            var config = JsonConvert.DeserializeObject<SwitchSceneActionConfig>(Configuration);
-            if (!config.SceneId.Equals(string.Empty) && PluginCache.ActiveScene?.Id != config.SceneId)
+            var config = JsonConvert.DeserializeObject<SwitchCollectionActionConfig>(Configuration);
+            if (!config.CollectionId.Equals(string.Empty) && PluginCache.ActiveCollection?.Id != config.CollectionId)
             {
-                _ = Task.Run(async () => await PluginCache.ScenesService.MakeSceneActiveAsync(config.SceneId));
+                _ = Task.Run(async () => await PluginCache.SceneCollectionsService.LoadAsync(config.CollectionId));
             }
         }
 

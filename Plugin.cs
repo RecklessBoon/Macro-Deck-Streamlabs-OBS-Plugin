@@ -30,6 +30,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
             _ = InitClientAsync();
 
             this.Actions = new List<PluginAction> {
+                new SwitchCollectionAction(),
                 new SwitchSceneAction()
             };
         }
@@ -106,12 +107,14 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
 
         protected void OnSceneSwitched(object sender, ISceneModel scene)
         {
+            PluginCache.ActiveScene = (Scene)scene;
             VariableManager.SetValue("slobs_active_scene_name", scene.Name, VariableType.String, PluginCache.Plugin, null);
             VariableManager.SetValue("slobs_active_scene_id", scene.Id, VariableType.String, PluginCache.Plugin, null);
         }
 
         protected void OnCollectionSwitched(object sender, SceneCollectionsManifestEntry collection)
         {
+            PluginCache.ActiveCollection = collection;
             VariableManager.SetValue("slobs_active_scene_collection_name", collection.Name, VariableType.String, PluginCache.Plugin, null);
             VariableManager.SetValue("slobs_active_scene_collection_id", collection.Id, VariableType.String, PluginCache.Plugin, null);
             _ = Task.Run(async () => {
@@ -142,5 +145,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
         public static SceneCollectionsService SceneCollectionsService { get; set; }
         public static StreamingService StreamingService { get; set; }
         public static SceneCollectionSchema[] CollectionSchemas { get; set; }
+        public static SceneCollectionsManifestEntry ActiveCollection { get; set; }
+        public static Scene ActiveScene { get; set; }
     }
 }
