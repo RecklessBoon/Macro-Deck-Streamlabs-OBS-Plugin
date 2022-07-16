@@ -94,18 +94,21 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
         {
             PluginCache.ReplayBufferState = state;
             VariableManager.SetValue("slobs_replay_buffer_status", state, VariableType.String, PluginCache.Plugin, null);
+            VariableManager.SetValue("slobs_replay_buffer", (state != EReplayBufferState.OFFLINE), VariableType.Bool, PluginCache.Plugin, null);
         }
 
         private void OnRecordingStatusChanged(object sender, ERecordingState state)
         {
             PluginCache.RecordingState = state;
             VariableManager.SetValue("slobs_recording_status", state, VariableType.String, PluginCache.Plugin, null);
+            VariableManager.SetValue("slobs_recording", (state != ERecordingState.OFFLINE), VariableType.String, PluginCache.Plugin, null);
         }
 
         private void OnStreamingStatusChanged(object sender, EStreamingState state)
         {
             PluginCache.StreamingState = state;
             VariableManager.SetValue("slobs_streaming_status", state, VariableType.String, PluginCache.Plugin, null);
+            VariableManager.SetValue("slobs_recording", (state != EStreamingState.OFFLINE), VariableType.String, PluginCache.Plugin, null);
         }
 
         protected void OnSceneSwitched(object sender, ISceneModel scene)
