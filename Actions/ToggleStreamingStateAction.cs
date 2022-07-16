@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls;
 using Streamlabs_OBS_Plugin.Services;
@@ -10,38 +11,28 @@ using System.Threading.Tasks;
 
 namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
 {
-    public class SwitchCollectionActionConfig
-    {
-        public string CollectionId { get; set; }
-    }
-
-    public class SwitchCollectionAction : PluginAction
+    public class ToggleStreamingStateAction : PluginAction
     {
         // The name of the action
-        public override string Name => "Switch Scene Collection";
+        public override string Name => "Start/Stop Stream";
 
         // A short description what the action can do
-        public override string Description => "Switch to a specific Scene Collection";
+        public override string Description => "Toggles stream start/stop";
 
         // Optional; Add if this action can be configured. This will make the ActionConfigurator calling GetActionConfigurator();
-        public override bool CanConfigure => true;
+        public override bool CanConfigure => false;
 
         // Optional; Add if you added CanConfigure; Gets called when the action can be configured and the action got selected in the ActionSelector. You need to return a user control with the "ActionConfigControl" class as base class
-        public override ActionConfigControl GetActionConfigControl(ActionConfigurator actionConfigurator)
+        /*public override ActionConfigControl GetActionConfigControl(ActionConfigurator actionConfigurator)
         {
-            return new SwitchCollectionActionConfigurator(this, actionConfigurator);
-        }
+            
+        }*/
 
         // Gets called when the action is triggered by a button press or an event
         public override void Trigger(string clientId, ActionButton actionButton)
         {
-            if (PluginCache.SceneCollectionsService.GetType() != typeof(SceneCollectionsService)) return;
-
-            var config = JsonConvert.DeserializeObject<SwitchCollectionActionConfig>(Configuration);
-            if (!config.CollectionId.Equals(string.Empty) && PluginCache.ActiveCollection?.Id != config.CollectionId)
-            {
-                _ = PluginCache.SceneCollectionsService.LoadAsync(config.CollectionId);
-            }
+            if (PluginCache.StreamingService.GetType() != typeof(StreamingService)) return;
+            _ = PluginCache.StreamingService.ToggleStreamingAsync();
         }
 
         // Optional; Gets called when the action button gets deleted

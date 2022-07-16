@@ -39,7 +39,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
             var config = JsonConvert.DeserializeObject<SwitchSceneActionConfig>(Configuration);
             if (!config.SceneId.Equals(string.Empty) && PluginCache.ActiveScene?.Id != config.SceneId)
             {
-                _ = Task.Run(async () => await PluginCache.ScenesService.MakeSceneActiveAsync(config.SceneId));
+                _ = PluginCache.ScenesService.MakeSceneActiveAsync(config.SceneId);
             }
         }
 

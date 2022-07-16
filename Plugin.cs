@@ -31,7 +31,10 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
 
             this.Actions = new List<PluginAction> {
                 new SwitchCollectionAction(),
-                new SwitchSceneAction()
+                new SwitchSceneAction(),
+                new ToggleStreamingStateAction(),
+                new ToggleRecordingStateAction(),
+                new SetReplayBufferStateAction()
             };
         }
 
@@ -65,10 +68,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
                     var collection = await PluginCache.SceneCollectionsService.ActiveCollectionAsync();
                     OnCollectionSwitched(this, collection);
                 });
-                _ = Task.Run(async () =>
-                {
-                    PluginCache.CollectionSchemas = await PluginCache.SceneCollectionsService.FetchSceneCollectionsSchemaAsync();
-                });
+                _ = PluginCache.CollectionSchemas = await PluginCache.SceneCollectionsService.FetchSceneCollectionsSchemaAsync();
             }
         }
 
@@ -92,16 +92,19 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
 
         private void OnReplayBufferStatusChanged(object sender, EReplayBufferState state)
         {
+            PluginCache.ReplayBufferState = state;
             VariableManager.SetValue("slobs_replay_buffer_status", state, VariableType.String, PluginCache.Plugin, null);
         }
 
         private void OnRecordingStatusChanged(object sender, ERecordingState state)
         {
+            PluginCache.RecordingState = state;
             VariableManager.SetValue("slobs_recording_status", state, VariableType.String, PluginCache.Plugin, null);
         }
 
         private void OnStreamingStatusChanged(object sender, EStreamingState state)
         {
+            PluginCache.StreamingState = state;
             VariableManager.SetValue("slobs_streaming_status", state, VariableType.String, PluginCache.Plugin, null);
         }
 
@@ -147,5 +150,8 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
         public static SceneCollectionSchema[] CollectionSchemas { get; set; }
         public static SceneCollectionsManifestEntry ActiveCollection { get; set; }
         public static Scene ActiveScene { get; set; }
+        public static EReplayBufferState ReplayBufferState { get; set; }
+        public static EStreamingState StreamingState { get; set; }
+        public static ERecordingState RecordingState { get; set; }
     }
 }
