@@ -30,6 +30,12 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Compile Update="UI\Controls\SetRecordingStateActionConfigurator.cs">
+        <SubType>UserControl</SubType>
+      </Compile>
+      <Compile Update="UI\Controls\SetStreamingStateActionConfigurator.cs">
+        <SubType>UserControl</SubType>
+      </Compile>
       <Compile Update="UI\Controls\SetReplayBufferStateActionConfigurator.cs">
         <SubType>UserControl</SubType>
       </Compile>

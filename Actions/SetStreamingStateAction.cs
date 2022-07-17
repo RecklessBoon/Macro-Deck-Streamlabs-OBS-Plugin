@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
 {
-    public class SetReplayBufferStateActionConfig
+    public class SetStreamingStateActionConfig
     {
-        public enum SetReplayBufferActionType
+        public enum SetStreamingActionType
         {
             None, // Not in UI
             Start,
@@ -21,17 +21,17 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
             Toggle
         }
 
-        private SetReplayBufferActionType _actionType = SetReplayBufferActionType.None;
-        public SetReplayBufferActionType ActionType { get => _actionType; set => _actionType = value; }
+        private SetStreamingActionType _actionType = SetStreamingActionType.None;
+        public SetStreamingActionType ActionType { get => _actionType; set => _actionType = value; }
     }
 
-    public class SetReplayBufferStateAction : PluginAction
+    public class SetStreamingStateAction : PluginAction
     {
         // The name of the action
-        public override string Name => "Set Replay Buffer State";
+        public override string Name => "Set Streaming State";
 
         // A short description what the action can do
-        public override string Description => "Start/Stop Replay Buffer";
+        public override string Description => "Start/Stop Streaming";
 
         // Optional; Add if this action can be configured. This will make the ActionConfigurator calling GetActionConfigurator();
         public override bool CanConfigure => true;
@@ -39,7 +39,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
         // Optional; Add if you added CanConfigure; Gets called when the action can be configured and the action got selected in the ActionSelector. You need to return a user control with the "ActionConfigControl" class as base class
         public override ActionConfigControl GetActionConfigControl(ActionConfigurator actionConfigurator)
         {
-            return new SetReplayBufferStateActionConfigurator(this, actionConfigurator);
+            return new SetStreamingStateActionConfigurator(this, actionConfigurator);
         }
 
         // Gets called when the action is triggered by a button press or an event
@@ -47,24 +47,25 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
         {
             if (PluginCache.StreamingService.GetType() != typeof(StreamingService)) return;
 
-            var config = JsonConvert.DeserializeObject<SetReplayBufferStateActionConfig>(Configuration);
+            var config = JsonConvert.DeserializeObject<SetStreamingStateActionConfig>(Configuration);
             switch (config.ActionType) {
-                case SetReplayBufferStateActionConfig.SetReplayBufferActionType.Start:
-                    _ = PluginCache.StreamingService.StartReplayBufferAsync();
-                    break;
-                case SetReplayBufferStateActionConfig.SetReplayBufferActionType.Stop:
-                    _ = PluginCache.StreamingService.StopReplayBufferAsync();
-                    break;
-                case SetReplayBufferStateActionConfig.SetReplayBufferActionType.Toggle:
-                    if (PluginCache.ReplayBufferState == EReplayBufferState.RUNNING)
+                case SetStreamingStateActionConfig.SetStreamingActionType.Start:
+                    if (PluginCache.StreamingState == EStreamingState.OFFLINE)
                     {
-                        _ = PluginCache.StreamingService.StopReplayBufferAsync();
-                    } else if (PluginCache.ReplayBufferState == EReplayBufferState.OFFLINE)
-                    {
-                        _ = PluginCache.StreamingService.StartReplayBufferAsync();
+                        _ = PluginCache.StreamingService.ToggleStreamingAsync();
                     }
                     break;
-                case SetReplayBufferStateActionConfig.SetReplayBufferActionType.None:
+                case SetStreamingStateActionConfig.SetStreamingActionType.Stop:
+                    if (PluginCache.StreamingState == EStreamingState.LIVE ||
+                        PluginCache.StreamingState == EStreamingState.RECONNECTING)
+                    {
+                        _ = PluginCache.StreamingService.ToggleStreamingAsync();
+                    }
+                    break;
+                case SetStreamingStateActionConfig.SetStreamingActionType.Toggle:
+                    _ = PluginCache.StreamingService.ToggleStreamingAsync();
+                    break;
+                case SetStreamingStateActionConfig.SetStreamingActionType.None:
                 default:
                     break;
             }

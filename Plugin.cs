@@ -32,8 +32,8 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
             this.Actions = new List<PluginAction> {
                 new SwitchCollectionAction(),
                 new SwitchSceneAction(),
-                new ToggleStreamingStateAction(),
-                new ToggleRecordingStateAction(),
+                new SetStreamingStateAction(),
+                new SetRecordingStateAction(),
                 new SetReplayBufferStateAction()
             };
         }
