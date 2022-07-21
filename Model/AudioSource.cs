@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model
 {
-    class AudioSource : IAudioSourceModel
+    public class AudioSource : IAudioSourceModel
     {
         [JsonProperty("resourceId")]
         public string ResourceId { get; set; }
@@ -18,7 +18,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model
         public double AudioMixers { get; set; }
 
         [JsonProperty("fader")]
-        public IFader Fader { get; set; }
+        public Fader Fader { get; set; }
 
         [JsonProperty("forceMono")]
         public bool ForceMono { get; set; }
@@ -43,6 +43,6 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model
 
         public async Task SetDeflectionAsync(double deflection) => await BaseService.MakeCallAsync(this.ResourceId, deflection);
 
-        public async Task SetMutedAsync(bool muted) => await BaseService.MakeCallAsync(this.ResourceId, muted);
+        public async Task SetMutedAsync(bool muted) => await BaseService.MakeCallAsync(this.ResourceId, new { muted });
     }
 }

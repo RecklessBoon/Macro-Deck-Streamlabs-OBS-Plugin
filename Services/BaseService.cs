@@ -108,9 +108,9 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
             }
         }
 
-        private static string[] ObjectArrayToStringArray(object[] args)
+        private static object[] ObjectArrayToStringArray(object[] args)
         {
-            var string_args = new List<string>();
+            var string_args = new List<object>();
             foreach (var arg in args)
             {
                 foreach (var property in arg.GetType().GetProperties())
@@ -119,6 +119,10 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
                     if (val.GetType() == typeof(object))
                     {
                         string_args.Add(JsonConvert.SerializeObject(property.GetValue(arg)));
+                    }
+                    else if (val.GetType() == typeof(bool))
+                    {
+                        string_args.Add(val);
                     }
                     else
                     {

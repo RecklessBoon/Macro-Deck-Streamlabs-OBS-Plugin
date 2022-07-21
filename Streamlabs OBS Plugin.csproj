@@ -39,6 +39,9 @@
       <Compile Update="UI\Controls\SetReplayBufferStateActionConfigurator.cs">
         <SubType>UserControl</SubType>
       </Compile>
+      <Compile Update="UI\Controls\SetAudioSourceMuteActionConfigurator.cs">
+        <SubType>UserControl</SubType>
+      </Compile>
       <Compile Update="UI\Controls\SwitchCollectionActionConfigurator.cs">
         <SubType>UserControl</SubType>
       </Compile>

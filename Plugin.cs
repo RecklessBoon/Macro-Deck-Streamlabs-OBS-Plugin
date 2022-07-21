@@ -36,6 +36,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
                 new SetRecordingStateAction(),
                 new SetReplayBufferStateAction(),
                 new SaveReplayAction(),
+                new SetAudioSourceMuteAction(),
             };
         }
 
@@ -62,14 +63,13 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
                 PluginCache.ScenesService = new ScenesService();
                 PluginCache.SceneCollectionsService = new SceneCollectionsService();
                 PluginCache.StreamingService = new StreamingService();
+                PluginCache.AudioService = new AudioService();
                 connection.Start();
                 WireListeners();
-                _ = Task.Run(async () =>
-                {
-                    var collection = await PluginCache.SceneCollectionsService.ActiveCollectionAsync();
-                    OnCollectionSwitched(this, collection);
-                });
-                _ = PluginCache.CollectionSchemas = await PluginCache.SceneCollectionsService.FetchSceneCollectionsSchemaAsync();
+                var collection = await PluginCache.SceneCollectionsService.ActiveCollectionAsync();
+                OnCollectionSwitched(this, collection);
+                PluginCache.CollectionSchemas = await PluginCache.SceneCollectionsService.FetchSceneCollectionsSchemaAsync();
+                PluginCache.AudioSources = await PluginCache.AudioService.GetSourcesAsync();
             }
         }
 
@@ -151,7 +151,9 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
         public static ScenesService ScenesService { get; set; }
         public static SceneCollectionsService SceneCollectionsService { get; set; }
         public static StreamingService StreamingService { get; set; }
+        public static AudioService AudioService { get; set; }
         public static SceneCollectionSchema[] CollectionSchemas { get; set; }
+        public static AudioSource[] AudioSources { get; set; }
         public static SceneCollectionsManifestEntry ActiveCollection { get; set; }
         public static Scene ActiveScene { get; set; }
         public static EReplayBufferState ReplayBufferState { get; set; }
