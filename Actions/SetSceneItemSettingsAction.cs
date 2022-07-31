@@ -1,13 +1,11 @@
 ﻿using Newtonsoft.Json;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model;
-using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls;
 using Streamlabs_OBS_Plugin.Services;
 using SuchByte.MacroDeck.ActionButton;
 using SuchByte.MacroDeck.GUI;
 using SuchByte.MacroDeck.GUI.CustomControls;
 using SuchByte.MacroDeck.Plugins;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
@@ -66,79 +64,72 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
             if (PluginCache.ScenesService.GetType() != typeof(ScenesService)) return;
 
             var config = JsonConvert.DeserializeObject<SetSceneItemSettingsActionConfig>(Configuration);
-            if (!config.SceneId.Equals(string.Empty) && !config.ItemId.Equals(string.Empty) && config.Settings != null)
-            {
-                Visible = false
-            };
-
             _ = Task.Run(async () =>
             {
-                    var scene = await PluginCache.ScenesService.GetSceneAsync(config.SceneId);
-                    var item = await scene.GetItemAsync(config.ItemId);
-                        var settings = new SceneItemSettings()
-                        {
-                            Locked = item.Locked,
-                            RecordingVisible = item.RecordingVisible,
-                            StreamVisible = item.StreamVisible,
-                        Visible = item.Visible
-                        };
+                var scene = await PluginCache.ScenesService.GetSceneAsync(config.SceneId);
+                var item = await scene.GetItemAsync(config.ItemId);
+                var settings = new SceneItemSettings()
+                {
+                    Locked = item.Locked,
+                    RecordingVisible = item.RecordingVisible,
+                    StreamVisible = item.StreamVisible,
+                    Visible = item.Visible
+                };
 
-                    switch (config.Settings.Locked)
-                    {
-                        case LockedType.Toggle:
-                            settings.Locked = !settings.Locked;
-                            break;
-                        case LockedType.Locked:
-                            settings.Locked = true;
-                            break;
-                        case LockedType.Unlocked:
-                            settings.Locked = false;
-                            break;
+                switch (config.Settings.Locked)
+                {
+                    case LockedType.Toggle:
+                        settings.Locked = !settings.Locked;
+                        break;
+                    case LockedType.Locked:
+                        settings.Locked = true;
+                        break;
+                    case LockedType.Unlocked:
+                        settings.Locked = false;
+                        break;
                 }
+
+                switch (config.Settings.RecordingVisible)
+                {
+                    case VisibleType.Toggle:
+                        settings.RecordingVisible = !settings.RecordingVisible;
+                        break;
+                    case VisibleType.Visible:
+                        settings.RecordingVisible = true;
+                        break;
+                    case VisibleType.Hidden:
+                        settings.RecordingVisible = false;
+                        break;
+                }
+
+                switch (config.Settings.StreamVisible)
+                {
+                    case VisibleType.Toggle:
+                        settings.StreamVisible = !settings.StreamVisible;
+                        break;
+                    case VisibleType.Visible:
+                        settings.StreamVisible = true;
+                        break;
+                    case VisibleType.Hidden:
+                        settings.StreamVisible = false;
+                        break;
+                }
+
+                switch (config.Settings.Visible)
+                {
+                    case VisibleType.Toggle:
+                        settings.Visible = !settings.Visible;
+                        break;
+                    case VisibleType.Visible:
+                        settings.Visible = true;
+                        break;
+                    case VisibleType.Hidden:
+                        settings.Visible = false;
+                        break;
+                }
+
+                _ = item.SetSettingsAsync(settings);
             });
-
-                    switch (config.Settings.RecordingVisible)
-                    {
-                        case VisibleType.Toggle:
-                            settings.RecordingVisible = !settings.RecordingVisible;
-                            break;
-                        case VisibleType.Visible:
-                            settings.RecordingVisible = true;
-                            break;
-                        case VisibleType.Hidden:
-                            settings.RecordingVisible = false;
-                            break;
-                    }
-
-                    switch (config.Settings.StreamVisible)
-                            {
-                        case VisibleType.Toggle:
-                            settings.StreamVisible = !settings.StreamVisible;
-                            break;
-                        case VisibleType.Visible:
-                            settings.StreamVisible = true;
-                            break;
-                        case VisibleType.Hidden:
-                            settings.StreamVisible = false;
-                            break;
-                            } 
-
-                    switch (config.Settings.Visible)
-                            {
-                        case VisibleType.Toggle:
-                            settings.Visible = !settings.Visible;
-                            break;
-                        case VisibleType.Visible:
-                            settings.Visible = true;
-                            break;
-                        case VisibleType.Hidden:
-                            settings.Visible = false;
-                            break;
-                    }
-
-                    _ = item.SetSettingsAsync(settings);
-                });
-            }
         }
 
         // Optional; Gets called when the action button gets deleted
