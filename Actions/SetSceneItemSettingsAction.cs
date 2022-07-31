@@ -68,17 +68,20 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
             var config = JsonConvert.DeserializeObject<SetSceneItemSettingsActionConfig>(Configuration);
             if (!config.SceneId.Equals(string.Empty) && !config.ItemId.Equals(string.Empty) && config.Settings != null)
             {
-                _ = Task.Run(async () =>
-                {
+                Visible = false
+            };
+
+            _ = Task.Run(async () =>
+            {
                     var scene = await PluginCache.ScenesService.GetSceneAsync(config.SceneId);
                     var item = await scene.GetItemAsync(config.ItemId);
-                    var settings = new SceneItemSettings()
-                    {
-                        Locked = item.Locked,
-                        RecordingVisible = item.RecordingVisible,
-                        StreamVisible = item.StreamVisible,
+                        var settings = new SceneItemSettings()
+                        {
+                            Locked = item.Locked,
+                            RecordingVisible = item.RecordingVisible,
+                            StreamVisible = item.StreamVisible,
                         Visible = item.Visible
-                    };
+                        };
 
                     switch (config.Settings.Locked)
                     {
@@ -91,7 +94,8 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
                         case LockedType.Unlocked:
                             settings.Locked = false;
                             break;
-                    }
+                }
+            });
 
                     switch (config.Settings.RecordingVisible)
                     {
@@ -107,7 +111,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
                     }
 
                     switch (config.Settings.StreamVisible)
-                    {
+                            {
                         case VisibleType.Toggle:
                             settings.StreamVisible = !settings.StreamVisible;
                             break;
@@ -117,10 +121,10 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
                         case VisibleType.Hidden:
                             settings.StreamVisible = false;
                             break;
-                    }
+                            } 
 
                     switch (config.Settings.Visible)
-                    {
+                            {
                         case VisibleType.Toggle:
                             settings.Visible = !settings.Visible;
                             break;
