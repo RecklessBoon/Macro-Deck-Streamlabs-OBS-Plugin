@@ -41,7 +41,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model
         public bool StreamVisible { get; set; }
 
         [JsonProperty("transform")]
-        public ITransform Transform { get; set; }
+        public Transform Transform { get; set; }
 
         [JsonProperty("visible")]
         public bool Visible { get; set; }

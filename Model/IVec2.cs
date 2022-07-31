@@ -2,7 +2,7 @@
 {
     public interface IVec2
     {
-        double X { get; set; }
-        double Y { get; set; }
+        double? X { get; set; }
+        double? Y { get; set; }
     }
 }

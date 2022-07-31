@@ -18,7 +18,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model
         public TSceneNodeType SceneNodeType { get; set; }
         public string SourceId { get; set; }
         public bool StreamVisible { get; set; }
-        public ITransform Transform { get; set; }
+        public Transform Transform { get; set; }
         public bool Visible { get; set; }
     }
 }

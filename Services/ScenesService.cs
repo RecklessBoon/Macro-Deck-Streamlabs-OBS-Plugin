@@ -18,10 +18,10 @@ namespace Streamlabs_OBS_Plugin.Services
         public event EventHandler<Scene> SceneRemoved { add => AddSubscriber(value); remove => RemoveSubscriber(value); }
         public event EventHandler<Scene> SceneSwitched { add => AddSubscriber(value); remove => RemoveSubscriber(value); }
 
-        public async Task<Scene> CreateSceneAsync(string name) => await MakeCallAsync<Scene>(this.GetType().Name, new { name });
-        public async Task<Scene> GetSceneAsync(string id) => await MakeCallAsync<Scene>(this.GetType().Name, new { id });
+        public async Task<Scene> CreateSceneAsync(string name) => await MakeCallAsync<Scene>(this.GetType().Name, name);
+        public async Task<Scene> GetSceneAsync(string id) => await MakeCallAsync<Scene>(this.GetType().Name, id);
         public async Task<Scene[]> GetScenesAsync() => await MakeCallAsync<Scene[]>(this.GetType().Name);
-        public async Task<bool> MakeSceneActiveAsync(string id) => await MakeCallAsync<bool>(this.GetType().Name, new { id });
-        public async Task<Scene> RemoveSceneAsync(string id) => await MakeCallAsync<Scene>(this.GetType().Name, new { id });
+        public async Task<bool> MakeSceneActiveAsync(string id) => await MakeCallAsync<bool>(this.GetType().Name, id);
+        public async Task<Scene> RemoveSceneAsync(string id) => await MakeCallAsync<Scene>(this.GetType().Name, id);
     }
 }

@@ -10,6 +10,8 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
 {
     public class BaseService
     {
+        public static object[] Args(params object[] args) => args;
+
         public static string FromPascalToCamelCase(string pascalString) => Char.ToLowerInvariant(pascalString[0]) + pascalString.Replace("Async", "")[1..];
 
         public static async Task MakeCallAsync(string resource, object arg, [CallerMemberName] string method = "") => await MakeCallAsync(resource, new object[1] { arg }, method);
@@ -26,7 +28,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
                 param_args = new
                 {
                     resource,
-                    args = ObjectArrayToStringArray(args)
+                    args = args
                 };
             }
 
@@ -51,7 +53,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
                 param_args = new
                 {
                     resource,
-                    args = ObjectArrayToStringArray(args)
+                    args = args
                 };
             };
 
@@ -108,7 +110,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
             }
         }
 
-        private static object[] ObjectArrayToStringArray(object[] args)
+        /*private static object[] ObjectArrayToStringArray(object[] args)
         {
             var string_args = new List<object>();
             foreach (var arg in args)
@@ -131,7 +133,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
                 }
             }
             return string_args.ToArray();
-        }
+        }*/
 
         protected void AddSubscriber(EventHandler handler, [CallerMemberName] string propertyName = "")
         {

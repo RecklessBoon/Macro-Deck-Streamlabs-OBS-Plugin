@@ -1,10 +1,15 @@
 ﻿using Newtonsoft.Json;
+using static RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services.BaseService;
 using System;
+using System.Threading.Tasks;
 
 namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model
 {
     public class SceneItem : SceneNode, ISceneItemActions, ISceneItemModel
     {
+        [JsonProperty("resourceId")]
+        public string ResourceId { get; set; }
+
         [JsonProperty("childrenids")]
         public string[] ChildrenIds { get; set; }
 
@@ -27,64 +32,22 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model
         public bool StreamVisible { get; set; }
 
         [JsonProperty("transform")]
-        public ITransform Transform { get; set; }
+        public Transform Transform { get; set; }
 
         [JsonProperty("visible")]
         public bool Visible { get; set; }
 
-        public void CenterOnScreen()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void FitToScreen()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void FlipX()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void FlipY()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ResetTransform()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Rotate(double deg)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetContentCrop()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetSettings(ISceneItemSettings settings)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetTransform(ITransform transform)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetVisibility(bool visible)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void StretchToScreen()
-        {
-            throw new NotImplementedException();
-        }
+        public async Task CenterOnScreenAsync() => await MakeCallAsync(this.ResourceId);
+        public async Task FitToScreenAsync() => await MakeCallAsync(this.ResourceId);
+        public async Task FlipXAsync() => await MakeCallAsync(this.ResourceId);
+        public async Task FlipYAsync() => await MakeCallAsync(this.ResourceId);
+        public async Task ResetTransformAsync() => await MakeCallAsync(this.ResourceId);
+        public async Task RotateAsync(double deg) => await MakeCallAsync(this.ResourceId, deg);
+        public async Task RemoveAsync() => await MakeCallAsync(this.ResourceId);
+        public async Task SetContentCropAsync() => await MakeCallAsync(this.ResourceId);
+        public async Task SetSettingsAsync(ISceneItemSettings settings) => await MakeCallAsync(this.ResourceId, settings);
+        public async Task SetTransformAsync(ITransform transform) => await MakeCallAsync(this.ResourceId, transform);
+        public async Task SetVisibilityAsync(bool visible) => await MakeCallAsync(this.ResourceId, visible);
+        public async Task StretchToScreenAsync() => await MakeCallAsync(this.ResourceId);
     }
 }

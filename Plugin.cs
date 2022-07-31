@@ -37,6 +37,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
                 new SetReplayBufferStateAction(),
                 new SaveReplayAction(),
                 new SetAudioSourceMuteAction(),
+                new SetSceneItemSettingsAction(),
             };
         }
 
@@ -64,6 +65,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
                 PluginCache.SceneCollectionsService = new SceneCollectionsService();
                 PluginCache.StreamingService = new StreamingService();
                 PluginCache.AudioService = new AudioService();
+                PluginCache.SourcesService = new SourcesService();
                 connection.Start();
                 WireListeners();
                 var collection = await PluginCache.SceneCollectionsService.ActiveCollectionAsync();
@@ -152,6 +154,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
         public static SceneCollectionsService SceneCollectionsService { get; set; }
         public static StreamingService StreamingService { get; set; }
         public static AudioService AudioService { get; set; }
+        public static SourcesService SourcesService { get; set; }
         public static SceneCollectionSchema[] CollectionSchemas { get; set; }
         public static AudioSource[] AudioSources { get; set; }
         public static SceneCollectionsManifestEntry ActiveCollection { get; set; }

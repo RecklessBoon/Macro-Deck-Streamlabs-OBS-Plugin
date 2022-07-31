@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using static RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services.BaseService;
 
 namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model
 {
@@ -41,8 +42,8 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model
         [JsonProperty("syncOffset")]
         public double SyncOffset { get; set; }
 
-        public async Task SetDeflectionAsync(double deflection) => await BaseService.MakeCallAsync(this.ResourceId, deflection);
+        public async Task SetDeflectionAsync(double deflection) => await MakeCallAsync(this.ResourceId, deflection);
 
-        public async Task SetMutedAsync(bool muted) => await BaseService.MakeCallAsync(this.ResourceId, new { muted });
+        public async Task SetMutedAsync(bool muted) => await MakeCallAsync(this.ResourceId, muted);
     }
 }

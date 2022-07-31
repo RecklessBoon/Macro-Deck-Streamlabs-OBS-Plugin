@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services;
+using static RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services.BaseService;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -48,17 +48,17 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model
         [JsonProperty("width")]
         public double Width { get; set; }
 
-        public async Task<Source> DuplicateAsync() => await BaseService.MakeCallAsync<Source>(this.ResourceId);
+        public async Task<Source> DuplicateAsync() => await MakeCallAsync<Source>(this.ResourceId);
 
-        public async Task<Dictionary<string, object>> GetSettingsAsync() => await BaseService.MakeCallAsync<Dictionary<string, object>>(this.ResourceId);
+        public async Task<Dictionary<string, object>> GetSettingsAsync() => await MakeCallAsync<Dictionary<string, object>>(this.ResourceId);
 
-        public async Task<bool> HasPropsAsync() => await BaseService.MakeCallAsync<bool>(this.ResourceId);
+        public async Task<bool> HasPropsAsync() => await MakeCallAsync<bool>(this.ResourceId);
 
-        public async Task RefreshAsync() => await BaseService.MakeCallAsync(this.ResourceId);
+        public async Task RefreshAsync() => await MakeCallAsync(this.ResourceId);
 
-        public async Task SetNameAsync(string newName) => await BaseService.MakeCallAsync<string>(this.ResourceId, new { newName });
+        public async Task SetNameAsync(string newName) => await MakeCallAsync<string>(this.ResourceId, newName);
 
-        public async Task UpdateSettingsAsync(Dictionary<string, object> settings) => await BaseService.MakeCallAsync(this.ResourceId, new { settings });
+        public async Task UpdateSettingsAsync(Dictionary<string, object> settings) => await MakeCallAsync(this.ResourceId, settings);
 
     }
 }
