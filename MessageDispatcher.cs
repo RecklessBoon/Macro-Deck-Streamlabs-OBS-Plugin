@@ -18,6 +18,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
     {
         public event EventHandler<MessageDispatchedArgs> OnMessageDispatched;
         public event EventHandler<MessageDispatchedArgs> OnEventDispatched;
+        public event EventHandler<MessageDispatchedArgs> OnErrorDispatched;
 
         protected int _requestCount = 0;
         protected RPCConnection _connection;
@@ -136,7 +137,11 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
 
         private void DispatchMessage(object sender, MessageReceivedArgs e)
         {
-            if (e.Message.Id == null)
+            if (e.Message.Error != null)
+            {
+                OnErrorDispatched?.Invoke(this, new MessageDispatchedArgs { Type = MessageType.ErrorThrown, Response = e.Message });
+            }
+            else if (e.Message.Id == null)
             {
                 OnEventDispatched?.Invoke(this, new MessageDispatchedArgs { Type = MessageType.EventDispatch, Response = e.Message });
             }

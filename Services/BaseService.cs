@@ -10,6 +10,8 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
 {
     public class BaseService
     {
+        public static object[] Args(params object[] args) => args;
+
         public static string FromPascalToCamelCase(string pascalString) => Char.ToLowerInvariant(pascalString[0]) + pascalString.Replace("Async", "")[1..];
 
         public static async Task MakeCallAsync(string resource, object arg, [CallerMemberName] string method = "") => await MakeCallAsync(resource, new object[1] { arg }, method);
@@ -26,7 +28,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
                 param_args = new
                 {
                     resource,
-                    args = ObjectArrayToStringArray(args)
+                    args = args
                 };
             }
 
@@ -51,7 +53,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
                 param_args = new
                 {
                     resource,
-                    args = ObjectArrayToStringArray(args)
+                    args = args
                 };
             };
 
@@ -62,7 +64,12 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
             });
 
             var result = response.Result;
-            if (result.Type == JTokenType.Array)
+            if (result == null)
+            {
+                AppLogger.Error("Invalid response given for request from {0}", method);
+                return default(T);
+            }
+            else if (result.Type == JTokenType.Array)
             {
                 return result.ToObject<T>();
             }
@@ -106,31 +113,6 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
             {
                 return result.ToObject<T>();
             }
-        }
-
-        private static object[] ObjectArrayToStringArray(object[] args)
-        {
-            var string_args = new List<object>();
-            foreach (var arg in args)
-            {
-                foreach (var property in arg.GetType().GetProperties())
-                {
-                    var val = property.GetValue(arg);
-                    if (val.GetType() == typeof(object))
-                    {
-                        string_args.Add(JsonConvert.SerializeObject(property.GetValue(arg)));
-                    }
-                    else if (val.GetType() == typeof(bool))
-                    {
-                        string_args.Add(val);
-                    }
-                    else
-                    {
-                        string_args.Add(val.ToString());
-                    }
-                }
-            }
-            return string_args.ToArray();
         }
 
         protected void AddSubscriber(EventHandler handler, [CallerMemberName] string propertyName = "")

@@ -1,18 +1,20 @@
-﻿namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model
+﻿using System.Threading.Tasks;
+
+namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model
 {
     public interface ISceneItemActions
     {
-        public void CenterOnScreen();
-        public void FitToScreen();
-        public void FlipX();
-        public void FlipY();
-        public void Remove();
-        public void ResetTransform();
-        public void Rotate(double deg);
-        public void SetContentCrop();
-        public void SetSettings(ISceneItemSettings settings);
-        public void SetTransform(ITransform transform);
-        public void SetVisibility(bool visible);
-        public void StretchToScreen();
+        public Task CenterOnScreenAsync();
+        public Task FitToScreenAsync();
+        public Task FlipXAsync();
+        public Task FlipYAsync();
+        public Task RemoveAsync();
+        public Task ResetTransformAsync();
+        public Task RotateAsync(double deg);
+        public Task SetContentCropAsync();
+        public Task SetSettingsAsync(ISceneItemSettings settings);
+        public Task SetTransformAsync(ITransform transform);
+        public Task SetVisibilityAsync(bool visible);
+        public Task StretchToScreenAsync();
     }
 }

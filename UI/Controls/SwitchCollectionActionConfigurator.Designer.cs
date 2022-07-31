@@ -50,7 +50,7 @@
             this.panel1.Size = new System.Drawing.Size(615, 33);
             this.panel1.TabIndex = 0;
             // 
-            // cbxScene
+            // cbxCollection
             // 
             this.cbxCollection.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -60,9 +60,8 @@
             this.cbxCollection.ForeColor = System.Drawing.Color.White;
             this.cbxCollection.FormattingEnabled = true;
             this.cbxCollection.Location = new System.Drawing.Point(162, 3);
-            this.cbxCollection.Name = "cbxScene";
+            this.cbxCollection.Name = "cbxCollection";
             this.cbxCollection.Size = new System.Drawing.Size(450, 24);
-            this.cbxCollection.Sorted = true;
             this.cbxCollection.TabIndex = 3;
             // 
             // label1

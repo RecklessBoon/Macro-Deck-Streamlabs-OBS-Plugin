@@ -62,7 +62,6 @@
             this.cbxScene.Location = new System.Drawing.Point(77, 3);
             this.cbxScene.Name = "cbxScene";
             this.cbxScene.Size = new System.Drawing.Size(535, 24);
-            this.cbxScene.Sorted = true;
             this.cbxScene.TabIndex = 3;
             // 
             // label1

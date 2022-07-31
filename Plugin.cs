@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Converters;
-using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions;
+﻿using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services;
@@ -10,7 +9,6 @@ using SuchByte.MacroDeck.Variables;
 using System;
 using System.Collections.Generic;
 using System.IO.Pipes;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
@@ -37,6 +35,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
                 new SetReplayBufferStateAction(),
                 new SaveReplayAction(),
                 new SetAudioSourceMuteAction(),
+                new SetSceneItemSettingsAction(),
             };
         }
 
@@ -64,6 +63,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
                 PluginCache.SceneCollectionsService = new SceneCollectionsService();
                 PluginCache.StreamingService = new StreamingService();
                 PluginCache.AudioService = new AudioService();
+                PluginCache.SourcesService = new SourcesService();
                 connection.Start();
                 WireListeners();
                 var collection = await PluginCache.SceneCollectionsService.ActiveCollectionAsync();
@@ -75,11 +75,17 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
 
         protected void WireListeners()
         {
+            PluginCache.Dispatcher.OnErrorDispatched += OnErrorDispatched;
             PluginCache.ScenesService.SceneSwitched += OnSceneSwitched;
             PluginCache.SceneCollectionsService.CollectionSwitched += OnCollectionSwitched;
             PluginCache.StreamingService.StreamingStatusChange += OnStreamingStatusChanged;
             PluginCache.StreamingService.RecordingStatusChange += OnRecordingStatusChanged;
             PluginCache.StreamingService.ReplayBufferStatusChange += OnReplayBufferStatusChanged;
+        }
+
+        private void OnErrorDispatched(object sender, MessageDispatchedArgs e)
+        {
+            AppLogger.Error("Invalid response received: {0}", e.Response);
         }
 
         protected void ClipListeners()
@@ -124,7 +130,8 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
             PluginCache.ActiveCollection = collection;
             VariableManager.SetValue("slobs_active_scene_collection_name", collection.Name, VariableType.String, PluginCache.Plugin, null);
             VariableManager.SetValue("slobs_active_scene_collection_id", collection.Id, VariableType.String, PluginCache.Plugin, null);
-            _ = Task.Run(async () => {
+            _ = Task.Run(async () =>
+            {
                 var scene = await PluginCache.ScenesService.ActiveSceneAsync();
                 OnSceneSwitched(this, scene);
             });
@@ -152,6 +159,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
         public static SceneCollectionsService SceneCollectionsService { get; set; }
         public static StreamingService StreamingService { get; set; }
         public static AudioService AudioService { get; set; }
+        public static SourcesService SourcesService { get; set; }
         public static SceneCollectionSchema[] CollectionSchemas { get; set; }
         public static AudioSource[] AudioSources { get; set; }
         public static SceneCollectionsManifestEntry ActiveCollection { get; set; }

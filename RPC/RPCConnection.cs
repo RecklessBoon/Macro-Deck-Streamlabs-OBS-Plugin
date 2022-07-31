@@ -115,11 +115,11 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC
 
             _ = Task.Run(async () =>
             {
-                await Task.Delay(30000);
+                await Task.Delay(120000);
                 if (!tcs.Task.IsCompleted)
                 {
                     this.OnMessageReceived -= Watcher;
-                    tcs.SetException(new TimeoutException("No response given within 30 seconds. Abandonning watcher"));
+                    tcs.SetException(new TimeoutException("No response given within 2 minutes. Abandonning watcher"));
                 }
             });
 

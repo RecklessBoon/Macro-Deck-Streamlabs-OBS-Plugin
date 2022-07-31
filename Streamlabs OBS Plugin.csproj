@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <Version>0.0.1</Version>
-        <Author>carso</Author>
+        <Author>RecklessBoon</Author>
         <RootNamespace>RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin</RootNamespace>
         <PackageId>RecklessBoon.MacroDeck.StreamlabsOBSPlugin</PackageId>
         <AssemblyName>Streamlabs_OBS_Plugin</AssemblyName>
@@ -43,6 +43,9 @@
         <SubType>UserControl</SubType>
       </Compile>
       <Compile Update="UI\Controls\SwitchCollectionActionConfigurator.cs">
+        <SubType>UserControl</SubType>
+      </Compile>
+      <Compile Update="UI\Controls\SetSceneItemSettingsActionConfigurator.cs">
         <SubType>UserControl</SubType>
       </Compile>
     </ItemGroup>
