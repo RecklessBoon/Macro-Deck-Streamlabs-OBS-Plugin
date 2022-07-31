@@ -174,6 +174,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls
         {
             var selectedSceneOption = (SceneOption)((KeyValuePair<string, SceneOption>)ddlScene.SelectedItem).Value;
             var selectedItem = (KeyValuePair<string, string>)ddlItem.SelectedItem;
+
             var config = new SetSceneItemSettingsActionConfig
             {
                 SceneId = selectedSceneOption.Scene.Id,

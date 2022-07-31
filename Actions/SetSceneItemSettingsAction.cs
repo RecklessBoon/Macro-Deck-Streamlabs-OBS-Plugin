@@ -28,9 +28,20 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
 
     public class SetSceneItemSettingsActionConfig
     {
-        public string SceneId { get; set; }
-        public string ItemId { get; set; }
-        public SettingsType Settings { get; set; }
+        protected string sceneId = null;
+        public string SceneId { get => sceneId; set => sceneId = value; }
+
+        protected string itemId = null;
+        public string ItemId { get => itemId; set => itemId = value; }
+
+        protected SettingsType settings = new SettingsType()
+        {
+            Locked = LockedType.Unchanged,
+            RecordingVisible = VisibleType.Unchanged,
+            StreamVisible = VisibleType.Unchanged,
+            Visible = VisibleType.Unchanged
+        };
+        public SettingsType Settings { get => settings; set => settings = value; }
 
         public class SettingsType
         {

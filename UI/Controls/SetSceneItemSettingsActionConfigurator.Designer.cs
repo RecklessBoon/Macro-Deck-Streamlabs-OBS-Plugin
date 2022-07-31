@@ -33,15 +33,14 @@
             this.ddlItem = new SuchByte.MacroDeck.GUI.CustomControls.ComboBox();
             this.lblSceneItem = new System.Windows.Forms.Label();
             this.pnlSettings = new System.Windows.Forms.TableLayoutPanel();
-            this.ddlVisible = new SuchByte.MacroDeck.GUI.CustomControls.ComboBox();
             this.ddlStreamVisible = new SuchByte.MacroDeck.GUI.CustomControls.ComboBox();
             this.ddlRecordingVisible = new SuchByte.MacroDeck.GUI.CustomControls.ComboBox();
             this.ddlLocked = new SuchByte.MacroDeck.GUI.CustomControls.ComboBox();
-            this.label7 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.ddlVisible = new SuchByte.MacroDeck.GUI.CustomControls.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.ddlScene = new SuchByte.MacroDeck.GUI.CustomControls.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -65,7 +64,7 @@
             this.panel1.Location = new System.Drawing.Point(3, 40);
             this.panel1.Margin = new System.Windows.Forms.Padding(3, 40, 3, 3);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(591, 223);
+            this.panel1.Size = new System.Drawing.Size(591, 189);
             this.panel1.TabIndex = 0;
             // 
             // ddlItem
@@ -95,42 +94,28 @@
             // 
             this.pnlSettings.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.pnlSettings.AutoSize = true;
             this.pnlSettings.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.pnlSettings.ColumnCount = 2;
             this.pnlSettings.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.pnlSettings.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.pnlSettings.Controls.Add(this.ddlVisible, 1, 4);
             this.pnlSettings.Controls.Add(this.ddlStreamVisible, 1, 2);
             this.pnlSettings.Controls.Add(this.ddlRecordingVisible, 1, 1);
             this.pnlSettings.Controls.Add(this.ddlLocked, 1, 0);
-            this.pnlSettings.Controls.Add(this.label7, 0, 4);
             this.pnlSettings.Controls.Add(this.label3, 0, 0);
             this.pnlSettings.Controls.Add(this.label4, 0, 1);
             this.pnlSettings.Controls.Add(this.label5, 0, 2);
-            this.pnlSettings.Controls.Add(this.label6, 0, 3);
+            this.pnlSettings.Controls.Add(this.label7, 0, 3);
+            this.pnlSettings.Controls.Add(this.ddlVisible, 1, 3);
             this.pnlSettings.Location = new System.Drawing.Point(93, 63);
             this.pnlSettings.Name = "pnlSettings";
-            this.pnlSettings.RowCount = 5;
+            this.pnlSettings.RowCount = 4;
             this.pnlSettings.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.pnlSettings.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.pnlSettings.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.pnlSettings.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.pnlSettings.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.pnlSettings.Size = new System.Drawing.Size(495, 152);
+            this.pnlSettings.Size = new System.Drawing.Size(495, 120);
             this.pnlSettings.TabIndex = 5;
-            // 
-            // ddlVisible
-            // 
-            this.ddlVisible.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
-            this.ddlVisible.BorderRadius = 8;
-            this.ddlVisible.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ddlVisible.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.ddlVisible.ForeColor = System.Drawing.Color.White;
-            this.ddlVisible.FormattingEnabled = true;
-            this.ddlVisible.Location = new System.Drawing.Point(175, 122);
-            this.ddlVisible.Name = "ddlVisible";
-            this.ddlVisible.Size = new System.Drawing.Size(317, 24);
-            this.ddlVisible.TabIndex = 18;
             // 
             // ddlStreamVisible
             // 
@@ -171,17 +156,6 @@
             this.ddlLocked.Size = new System.Drawing.Size(317, 24);
             this.ddlLocked.TabIndex = 14;
             // 
-            // label7
-            // 
-            this.label7.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(94, 124);
-            this.label7.Margin = new System.Windows.Forms.Padding(3);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(75, 23);
-            this.label7.TabIndex = 13;
-            this.label7.Text = "Visible -";
-            // 
             // label3
             // 
             this.label3.Anchor = System.Windows.Forms.AnchorStyles.Right;
@@ -215,16 +189,29 @@
             this.label5.TabIndex = 10;
             this.label5.Text = "Stream Visible -";
             // 
-            // label6
+            // label7
             // 
-            this.label6.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(60, 93);
-            this.label6.Margin = new System.Windows.Forms.Padding(3);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(109, 23);
-            this.label6.TabIndex = 12;
-            this.label6.Text = "Transform -";
+            this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(94, 93);
+            this.label7.Margin = new System.Windows.Forms.Padding(3);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(75, 23);
+            this.label7.TabIndex = 13;
+            this.label7.Text = "Visible -";
+            // 
+            // ddlVisible
+            // 
+            this.ddlVisible.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
+            this.ddlVisible.BorderRadius = 8;
+            this.ddlVisible.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ddlVisible.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ddlVisible.ForeColor = System.Drawing.Color.White;
+            this.ddlVisible.FormattingEnabled = true;
+            this.ddlVisible.Location = new System.Drawing.Point(175, 93);
+            this.ddlVisible.Name = "ddlVisible";
+            this.ddlVisible.Size = new System.Drawing.Size(317, 24);
+            this.ddlVisible.TabIndex = 18;
             // 
             // label2
             // 
@@ -264,7 +251,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.panel1);
             this.Name = "SetSceneItemSettingsActionConfigurator";
-            this.Size = new System.Drawing.Size(597, 266);
+            this.Size = new System.Drawing.Size(597, 232);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.pnlSettings.ResumeLayout(false);
@@ -285,12 +272,11 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label6;
         private SuchByte.MacroDeck.GUI.CustomControls.ComboBox ddlItem;
         private System.Windows.Forms.Label lblSceneItem;
-        private SuchByte.MacroDeck.GUI.CustomControls.ComboBox ddlVisible;
         private SuchByte.MacroDeck.GUI.CustomControls.ComboBox ddlStreamVisible;
         private SuchByte.MacroDeck.GUI.CustomControls.ComboBox ddlRecordingVisible;
         private SuchByte.MacroDeck.GUI.CustomControls.ComboBox ddlLocked;
+        private SuchByte.MacroDeck.GUI.CustomControls.ComboBox ddlVisible;
     }
 }
