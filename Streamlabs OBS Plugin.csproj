@@ -30,6 +30,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Compile Update="UI\Controls\SetAudioSourceVolumeActionConfigurator.cs">
+        <SubType>UserControl</SubType>
+      </Compile>
       <Compile Update="UI\Controls\SetRecordingStateActionConfigurator.cs">
         <SubType>UserControl</SubType>
       </Compile>

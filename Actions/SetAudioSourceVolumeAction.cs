@@ -11,26 +11,19 @@ using System.Threading.Tasks;
 
 namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
 {
-    public class SetAudioSourceMuteActionConfig
+    public class SetAudioSourceVolumeActionConfig
     {
-        public enum MuteType
-        {
-            Mute,
-            Unmute,
-            Toggle
-        }
-
         public string SourceId { get; set; }
-        public MuteType Mute { get; set; }
+        public double? Deflection { get; set; }
     }
 
-    public class SetAudioSourceMuteAction : PluginAction
+    public class SetAudioSourceVolumeAction : PluginAction
     {
         // The name of the action
-        public override string Name => "Mute/Unmute Audio Source";
+        public override string Name => "Set Audio Source Volume/Deflection";
 
         // A short description what the action can do
-        public override string Description => "Set audio source mute/unmute state";
+        public override string Description => "Set audio source volume deflection";
 
         // Optional; Add if this action can be configured. This will make the ActionConfigurator calling GetActionConfigurator();
         public override bool CanConfigure => true;
@@ -38,7 +31,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
         // Optional; Add if you added CanConfigure; Gets called when the action can be configured and the action got selected in the ActionSelector. You need to return a user control with the "ActionConfigControl" class as base class
         public override ActionConfigControl GetActionConfigControl(ActionConfigurator actionConfigurator)
         {
-            return new SetAudioSourceMuteActionConfigurator(this, actionConfigurator);
+            return new SetAudioSourceVolumeActionConfigurator(this, actionConfigurator);
         }
 
         // Gets called when the action is triggered by a button press or an event
@@ -46,32 +39,13 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
         {
             if (PluginCache.AudioService.GetType() != typeof(AudioService)) return;
 
-            var config = JsonConvert.DeserializeObject<SetAudioSourceMuteActionConfig>(Configuration);
-            if (!config.SourceId.Equals(string.Empty))
+            var config = JsonConvert.DeserializeObject<SetAudioSourceVolumeActionConfig>(Configuration);
+            if (!config.SourceId.Equals(string.Empty) && config.Deflection != null)
             {
                 _ = Task.Run(async () =>
                 {
                     var source = await PluginCache.AudioService.GetSourceAsync(config.SourceId);
-                    switch (config.Mute)
-                    {
-                        case SetAudioSourceMuteActionConfig.MuteType.Mute:
-                            await source.SetMutedAsync(true);
-                            break;
-                        case SetAudioSourceMuteActionConfig.MuteType.Unmute:
-                            await source.SetMutedAsync(false);
-                            break;
-                        case SetAudioSourceMuteActionConfig.MuteType.Toggle:
-                        default:
-                            if (source.Muted)
-                            {
-                                await source.SetMutedAsync(false);
-                            } 
-                            else
-                            {
-                                await source.SetMutedAsync(true);
-                            }
-                            break;
-                    }
+                    await source.SetDeflectionAsync(config.Deflection ?? 0);
                 });
             }
         }

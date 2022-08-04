@@ -2,8 +2,8 @@
 {
     public interface IFader
     {
-        double Db { get; set; }
-        double Deflection { get; set; }
-        double Mul { get; set; }
+        double? Db { get; set; }
+        double? Deflection { get; set; }
+        double? Mul { get; set; }
     }
 }

@@ -35,6 +35,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
                 new SetReplayBufferStateAction(),
                 new SaveReplayAction(),
                 new SetAudioSourceMuteAction(),
+                new SetAudioSourceVolumeAction(),
                 new SetSceneItemSettingsAction(),
             };
         }
