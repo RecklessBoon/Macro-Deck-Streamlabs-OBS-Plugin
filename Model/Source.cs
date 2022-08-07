@@ -50,6 +50,8 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model
 
         public async Task<Source> DuplicateAsync() => await MakeCallAsync<Source>(this.ResourceId);
 
+        public async Task<object> GetPropertiesFormDataAsync() => await MakeCallAsync<object>(this.ResourceId);
+
         public async Task<Dictionary<string, object>> GetSettingsAsync() => await MakeCallAsync<Dictionary<string, object>>(this.ResourceId);
 
         public async Task<bool> HasPropsAsync() => await MakeCallAsync<bool>(this.ResourceId);
@@ -57,6 +59,8 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model
         public async Task RefreshAsync() => await MakeCallAsync(this.ResourceId);
 
         public async Task SetNameAsync(string newName) => await MakeCallAsync<string>(this.ResourceId, newName);
+
+        public async Task<object> SetPropertiesFormDataAsync(object properties) => await MakeCallAsync<object>(this.ResourceId, properties);
 
         public async Task UpdateSettingsAsync(Dictionary<string, object> settings) => await MakeCallAsync(this.ResourceId, settings);
 

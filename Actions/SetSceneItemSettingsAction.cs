@@ -55,10 +55,10 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
     public class SetSceneItemSettingsAction : PluginAction
     {
         // The name of the action
-        public override string Name => "Update Source";
+        public override string Name => "Update Scene Item Settings";
 
         // A short description what the action can do
-        public override string Description => "Set source settings";
+        public override string Description => "Set scene item settings";
 
         // Optional; Add if this action can be configured. This will make the ActionConfigurator calling GetActionConfigurator();
         public override bool CanConfigure => true;
