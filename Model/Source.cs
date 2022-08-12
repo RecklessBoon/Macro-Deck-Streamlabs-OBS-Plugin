@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model.OBS.Property;
 
 namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model
 {
@@ -50,7 +51,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model
 
         public async Task<Source> DuplicateAsync() => await MakeCallAsync<Source>(this.ResourceId);
 
-        public async Task<object> GetPropertiesFormDataAsync() => await MakeCallAsync<object>(this.ResourceId);
+        public async Task<object[]> GetPropertiesFormDataAsync() => await MakeCallAsync<object[]>(this.ResourceId);
 
         public async Task<Dictionary<string, object>> GetSettingsAsync() => await MakeCallAsync<Dictionary<string, object>>(this.ResourceId);
 
