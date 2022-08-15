@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.tblSettingsContainer = new System.Windows.Forms.TableLayoutPanel();
+            this.frmProperties = new RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls.OBS.OBSFormDataControl();
             this.lblSceneItem = new System.Windows.Forms.Label();
             this.ddlItem = new SuchByte.MacroDeck.GUI.CustomControls.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -44,7 +44,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panel1.AutoScroll = true;
-            this.panel1.Controls.Add(this.tblSettingsContainer);
+            this.panel1.Controls.Add(this.frmProperties);
             this.panel1.Controls.Add(this.lblSceneItem);
             this.panel1.Controls.Add(this.ddlItem);
             this.panel1.Controls.Add(this.label2);
@@ -54,20 +54,20 @@
             this.panel1.Size = new System.Drawing.Size(861, 70);
             this.panel1.TabIndex = 0;
             // 
-            // tblSettingsContainer
+            // frmProperties
             // 
-            this.tblSettingsContainer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.frmProperties.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tblSettingsContainer.AutoSize = true;
-            this.tblSettingsContainer.ColumnCount = 2;
-            this.tblSettingsContainer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tblSettingsContainer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tblSettingsContainer.Location = new System.Drawing.Point(93, 33);
-            this.tblSettingsContainer.Name = "tblSettingsContainer";
-            this.tblSettingsContainer.RowCount = 1;
-            this.tblSettingsContainer.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tblSettingsContainer.Size = new System.Drawing.Size(762, 23);
-            this.tblSettingsContainer.TabIndex = 8;
+            this.frmProperties.AutoSize = true;
+            this.frmProperties.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(45)))));
+            this.frmProperties.Location = new System.Drawing.Point(94, 35);
+            this.frmProperties.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.frmProperties.Name = "frmProperties";
+            this.frmProperties.Size = new System.Drawing.Size(761, 21);
+            this.frmProperties.TabIndex = 8;
+            this.frmProperties.AutoSize = true;
+            this.frmProperties.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowOnly;
+            this.frmProperties.Value = null;
             // 
             // lblSceneItem
             // 
@@ -105,6 +105,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 23F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScroll = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.Controls.Add(this.panel1);
             this.Name = "SetSourcePropertiesActionConfigurator";
@@ -122,6 +123,6 @@
         private System.Windows.Forms.Label label2;
         private SuchByte.MacroDeck.GUI.CustomControls.ComboBox ddlItem;
         private System.Windows.Forms.Label lblSceneItem;
-        private System.Windows.Forms.TableLayoutPanel tblSettingsContainer;
+        private OBS.OBSFormDataControl frmProperties;
     }
 }
