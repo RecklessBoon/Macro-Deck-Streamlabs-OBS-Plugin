@@ -2,6 +2,7 @@
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services;
+using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Dialog;
 using Streamlabs_OBS_Plugin.Services;
 using SuchByte.MacroDeck.Plugins;
@@ -72,6 +73,22 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
                 OnCollectionSwitched(this, collection);
                 PluginCache.CollectionSchemas = await PluginCache.SceneCollectionsService.FetchSceneCollectionsSchemaAsync();
                 PluginCache.AudioSources = await PluginCache.AudioService.GetSourcesAsync();
+
+                _ = Task.Run(async () =>
+                {
+                    var duplicates = await PluginCache.SourcesService.GetSourcesByNameAsync(SetSourcePropertiesActionConfigurator.DuplicateSourceName);
+                    if (duplicates.Length > 0)
+                    {
+                        AppLogger.Info("Performing duplicate source cleanup...");
+                        foreach (var duplicate in duplicates)
+                        {
+                            await PluginCache.SourcesService.RemoveSourceAsync(duplicate.Id);
+                        }
+                        AppLogger.Info("Done performing duplicate source cleanup");
+                    }
+                    
+                });
+
             }
         }
 

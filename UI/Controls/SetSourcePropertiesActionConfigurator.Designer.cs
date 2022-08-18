@@ -16,6 +16,7 @@
             if (disposing && (components != null))
             {
                 components.Dispose();
+                DuplicateSource = null;
             }
             base.Dispose(disposing);
         }

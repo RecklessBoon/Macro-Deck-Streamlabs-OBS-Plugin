@@ -17,7 +17,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
     {
         public Source Source { get; set; }
 
-        public Dictionary<string, object> FormData { get; set; }
+        public JArray FormData { get; set; }
     }
 
     public class SetSourcePropertiesAction : PluginAction
@@ -45,7 +45,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
             var config = JsonConvert.DeserializeObject<SetSourcePropertiesActionConfig>(Configuration);
             if (config.Source == default(Source) || config.FormData.Equals(string.Empty)) return;
 
-            _ = config.Source.UpdateSettingsAsync(config.FormData);
+            _ = config.Source.SetPropertiesFormDataAsync(config.FormData);
         }
 
         // Optional; Gets called when the action button gets deleted

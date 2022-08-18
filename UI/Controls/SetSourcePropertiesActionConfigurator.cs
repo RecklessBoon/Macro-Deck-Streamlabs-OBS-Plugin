@@ -29,6 +29,21 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls
             public override string ToString() => string.Format("{0}", Source.Name);
         }
 
+        private Source _DuplicateSource = null;
+        public Source DuplicateSource { 
+            get => _DuplicateSource;
+            set
+            {
+                if (_DuplicateSource != null)
+                {
+                    _ = PluginCache.SourcesService.RemoveSourceAsync(_DuplicateSource.Id);
+                }
+                _DuplicateSource = value;
+            }
+        }
+
+        public const string DuplicateSourceName = "SLOBS<->MDPLUGIN DUP SOURCE";
+
         // Add a variable for the instance of your action to get access to the Configuration etc.
         private SetSourcePropertiesAction _macroDeckAction;
 
@@ -43,9 +58,12 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls
             this.Dock = DockStyle.Fill;
 
             this._macroDeckAction = action;
-            this._config = action.Configuration != null ? JsonConvert.DeserializeObject<SetSourcePropertiesActionConfig>(action.Configuration) : null;
+            try
+            {
+                this._config = action.Configuration != null ? JsonConvert.DeserializeObject<SetSourcePropertiesActionConfig>(action.Configuration) : null;
+            }
+            catch (Exception) { }
 
-            ddlItem.SelectedIndexChanged += OnSourceChanged;
             _ = PopulateSourcesAsync();
             // Items populate from scene change
         }
@@ -62,6 +80,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls
             ddlItem.DisplayMember = "Value";
             ddlItem.ValueMember = "Key";
 
+            ddlItem.SelectedValueChanged += OnSourceChanged;
             if (_config != null && _config.Source != default(Source))
             {
                 ddlItem.SelectedValue = _config.Source.Id;
@@ -70,31 +89,52 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls
 
         private void OnSourceChanged(object sender, EventArgs e)
         {
-            var selectedSource = (KeyValuePair<string, SourceOption>)ddlItem.SelectedItem;
+            var selectedSource = (KeyValuePair<string, SourceOption>)ddlItem?.SelectedItem;
             SelectedSource = selectedSource.Value.Source;
+            DuplicateSource = null;
             
             _ = Task.Run(async () =>
             {
                 if (!selectedSource.Key.Equals(String.Empty))
                 {
                     var formData = await SelectedSource.GetPropertiesFormDataAsync();
-                    frmProperties.Invoke((MethodInvoker)delegate
-                    {
-                        frmProperties.Value = formData;
-                    });
-                    frmProperties.OnFormDataChanged += (object sender, FormDataChangedEventArgs e) =>
-                    {
-                        _ = Task.Run(async () =>
-                        {
-                            var dup = await SelectedSource.DuplicateAsync();
-                            await dup.SetPropertiesFormDataAsync(e.FormData);
-                            var newFormData = await dup.GetPropertiesFormDataAsync();
-                            _ = PluginCache.SourcesService.RemoveSourceAsync(dup.Id);
-                            frmProperties.Value = newFormData;
-                        });
-                    };
+                    PopulateFormData(formData);
                 }
             });
+        }
+
+        private bool FormDataInit = false;
+        private void PopulateFormData(JArray formData)
+        {
+            if (!FormDataInit && _config?.FormData != null)
+            {
+                foreach (var token in formData)
+                {
+                    var config_token = _config.FormData.Where(x => x["name"].ToString().Equals(token["name"].ToString())).First();
+                    token["value"] = config_token["value"];
+                }
+            }
+            frmProperties.Value = formData;
+            frmProperties.RefreshControls();
+            frmProperties.OnFormDataChanged += (object sender, FormDataChangedEventArgs e) =>
+            {
+                _ = Task.Run(async () =>
+                {
+                    if (DuplicateSource == null)
+                    {
+                        var dup = await SelectedSource.DuplicateAsync();
+                        _ = dup.SetNameAsync(DuplicateSourceName);
+                        dup.Name = DuplicateSourceName;
+                        DuplicateSource = dup;
+                    }
+
+                    await DuplicateSource.SetPropertiesFormDataAsync(e.FormData);
+                    var newFormData = await DuplicateSource.GetPropertiesFormDataAsync();     
+                    frmProperties.Value = newFormData;
+                    frmProperties.RefreshControls();
+                    FormDataInit = true;
+                });
+            };
         }
 
         public override bool OnActionSave()
@@ -104,7 +144,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls
             var config = new SetSourcePropertiesActionConfig
             {
                 Source = selectedSourceOption.Source,
-                //FormData = JsonConvert.DeserializeObject<Dictionary<string, object>>(txtFormData.Text)
+                FormData = frmProperties.Value
             };
             var json = JsonConvert.SerializeObject(config);
             this._macroDeckAction.ConfigurationSummary = string.Format("Update source {0} properties", selectedSourceOption.Source.Name); // Set a summary of the configuration that gets displayed in the ButtonConfigurator item
