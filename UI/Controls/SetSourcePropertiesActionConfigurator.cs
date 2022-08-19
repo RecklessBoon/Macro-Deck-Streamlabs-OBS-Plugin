@@ -129,9 +129,13 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls
                     }
 
                     await DuplicateSource.SetPropertiesFormDataAsync(e.FormData);
-                    var newFormData = await DuplicateSource.GetPropertiesFormDataAsync();     
+                    var newFormData = await DuplicateSource.GetPropertiesFormDataAsync();
                     frmProperties.Value = newFormData;
-                    frmProperties.RefreshControls();
+                    Invoke((MethodInvoker)delegate { 
+                        var scrollHeight = panel1.VerticalScroll.Value;
+                        frmProperties.RefreshControls();
+                        panel1.VerticalScroll.Value = scrollHeight;
+                    });
                     FormDataInit = true;
                 });
             };
