@@ -1,4 +1,6 @@
-﻿namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model.OBS.Property
+﻿using Newtonsoft.Json.Linq;
+
+namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model.OBS.Property
 {
     public enum PropertyType
     {
@@ -28,6 +30,6 @@
         bool Enabled { get; set; }
         bool Visible { get; set; }
         PropertyType Type { get; set; }
-        object[] Options { get; set; }
+        JArray Options { get; set; }
     }
 }

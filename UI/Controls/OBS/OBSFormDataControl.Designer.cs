@@ -34,6 +34,7 @@
             // tblPropertyContainer
             // 
             this.tblPropertyContainer.AutoSize = true;
+            this.tblPropertyContainer.BackColor = System.Drawing.Color.Transparent;
             this.tblPropertyContainer.ColumnCount = 2;
             this.tblPropertyContainer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tblPropertyContainer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
@@ -42,18 +43,19 @@
             this.tblPropertyContainer.Name = "tblPropertyContainer";
             this.tblPropertyContainer.RowCount = 1;
             this.tblPropertyContainer.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tblPropertyContainer.Size = new System.Drawing.Size(384, 38);
+            this.tblPropertyContainer.Size = new System.Drawing.Size(387, 150);
             this.tblPropertyContainer.TabIndex = 0;
             // 
             // OBSFormDataControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.AutoSize = true;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(45)))));
             this.Controls.Add(this.tblPropertyContainer);
+            this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "OBSFormDataControl";
-            this.Size = new System.Drawing.Size(384, 38);
+            this.Size = new System.Drawing.Size(387, 150);
             this.ResumeLayout(false);
             this.PerformLayout();
 

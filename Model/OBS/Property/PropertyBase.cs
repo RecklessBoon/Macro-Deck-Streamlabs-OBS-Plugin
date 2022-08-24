@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -13,6 +14,6 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model.OBS.Property
         public bool Visible { get; set; }
 
         public PropertyType Type { get; set; }
-        public object[] Options { get; set; }
+        public JArray Options { get; set; }
     }
 }

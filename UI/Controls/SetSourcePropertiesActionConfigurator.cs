@@ -111,8 +111,10 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls
                 foreach (var token in formData)
                 {
                     var config_token = _config.FormData.Where(x => x["name"].ToString().Equals(token["name"].ToString())).First();
+                    token["visible"] = config_token["visible"];
                     token["value"] = config_token["value"];
                 }
+                FormDataInit = true;
             }
             frmProperties.Value = formData;
             frmProperties.RefreshControls();
@@ -132,11 +134,10 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls
                     var newFormData = await DuplicateSource.GetPropertiesFormDataAsync();
                     frmProperties.Value = newFormData;
                     Invoke((MethodInvoker)delegate { 
-                        var scrollHeight = panel1.VerticalScroll.Value;
+                        var scrollHeight = tableLayoutPanel1.VerticalScroll.Value;
                         frmProperties.RefreshControls();
-                        panel1.VerticalScroll.Value = scrollHeight;
+                        tableLayoutPanel1.VerticalScroll.Value = scrollHeight;
                     });
-                    FormDataInit = true;
                 });
             };
         }

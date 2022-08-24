@@ -19,7 +19,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model.OBS.Property
 
     public class List : PropertyBase
     {
-        public new object[] Value { get; set; }
+        public new object Value { get; set; }
         public ListPropertyFormat Format { get; set; }
         public bool Editable { get; set; } = false;
         public ListPropertyType ListPropertyType
