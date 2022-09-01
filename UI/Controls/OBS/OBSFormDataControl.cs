@@ -59,6 +59,17 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls.OBS
 
             SuspendLayout();
             DrawingHelper.BeginControlUpdate(this);
+            var properties = Value.ToObject<PropertyBase[]>();
+            Control[] controls = new Control[tblPropertyContainer.Controls.Count];
+            tblPropertyContainer.Controls.CopyTo(controls, 0);
+            foreach(var control in controls)
+            {
+                PropertyBase property = properties.FirstOrDefault(prop => prop.Name == control.Name || prop.Name+"Label" == control.Name);
+                if (property == default)
+                {
+                    tblPropertyContainer.Controls.Remove(control);
+                }
+            }
             foreach (JObject data in Value)
             {
                 var property = data.ToObject<PropertyBase>();
@@ -299,11 +310,18 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls.OBS
                 //case PropertyType.OBS_PROPERTY_BUTTON:
                 case PropertyType.OBS_PROPERTY_FONT:
                     var fontData = data.ToObject<Model.OBS.Property.Font>();
-                    var fontControl = new RoundedTextBox 
+                    var text = String.Format("Font: {0} ({1}) - Size: {2}", fontData?.Value?["face"], fontData?.Value?["style"], fontData?.Value?["size"]);
+                    System.Drawing.Font font = default;
+                    try
+                    {
+                        font = new System.Drawing.Font(fontData.Value["face"].ToString(), 9.0f, Enum.Parse<System.Drawing.FontStyle>(fontData.Value["style"].ToString()));
+                    }
+                    catch (System.ArgumentException) { }
+                    var fontControl = new RoundedTextBox
                     {
                         ReadOnly = true, 
-                        Text = String.Format("Font: {0} ({1}) - Size: {2}", fontData.Value["face"], fontData.Value["style"], fontData.Value["size"]),
-                        Font = new System.Drawing.Font(fontData.Value["face"].ToString(), 9.0f, Enum.Parse<System.Drawing.FontStyle>(fontData.Value["style"].ToString())),
+                        Text = text,
+                        Font = font,
                     };
                     fontData.Value["style"] = !fontData.Value["style"].ToString().Equals(String.Empty) ? fontData.Value["style"] : FontStyle.Regular.ToString();
                     var fontDialog = new FontDialog { Font = new System.Drawing.Font(fontData.Value["face"].ToString(), (float)fontData.Value["size"], Enum.Parse<System.Drawing.FontStyle>(fontData.Value["style"].ToString())) };

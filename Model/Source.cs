@@ -54,7 +54,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model
 
         public async Task<JArray> GetPropertiesFormDataAsync() => await MakeCallAsync<JArray>(this.ResourceId);
 
-        public async Task<Dictionary<string, object>> GetSettingsAsync() => await MakeCallAsync<Dictionary<string, object>>(this.ResourceId);
+        public async Task<JObject> GetSettingsAsync() => await MakeCallAsync<JObject>(this.ResourceId);
 
         public async Task<bool> HasPropsAsync() => await MakeCallAsync<bool>(this.ResourceId);
 
@@ -64,7 +64,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model
 
         public async Task<JArray> SetPropertiesFormDataAsync(JArray properties) => await MakeCallAsync<JArray>(this.ResourceId, properties);
 
-        public async Task UpdateSettingsAsync(Dictionary<string, object> settings) => await MakeCallAsync(this.ResourceId, settings);
+        public async Task UpdateSettingsAsync(JObject settings) => await MakeCallAsync(this.ResourceId, settings);
 
     }
 }

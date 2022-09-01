@@ -74,21 +74,6 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
                 PluginCache.CollectionSchemas = await PluginCache.SceneCollectionsService.FetchSceneCollectionsSchemaAsync();
                 PluginCache.AudioSources = await PluginCache.AudioService.GetSourcesAsync();
 
-                _ = Task.Run(async () =>
-                {
-                    var duplicates = await PluginCache.SourcesService.GetSourcesByNameAsync(SetSourcePropertiesActionConfigurator.DuplicateSourceName);
-                    if (duplicates.Length > 0)
-                    {
-                        AppLogger.Info("Performing duplicate source cleanup...");
-                        foreach (var duplicate in duplicates)
-                        {
-                            await PluginCache.SourcesService.RemoveSourceAsync(duplicate.Id);
-                        }
-                        AppLogger.Info("Done performing duplicate source cleanup");
-                    }
-                    
-                });
-
             }
         }
 
