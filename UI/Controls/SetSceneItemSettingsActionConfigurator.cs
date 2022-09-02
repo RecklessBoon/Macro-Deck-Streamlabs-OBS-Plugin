@@ -43,26 +43,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls
             // Items populate from scene change
             PopulateLockedDDLs();
             PopulateVisibleDDLs();
-
-            //cbxRecordingVisible.CheckedChanged += CbxRecordingVisible_CheckedChanged;
-            //cbxStreamVisible.CheckedChanged += CbxStreamVisible_CheckedChanged;
         }
-
-        /*private void CbxRecordingVisible_CheckedChanged(object sender, EventArgs e)
-        {
-            if (!cbxStreamVisible.Checked && !cbxRecordingVisible.Checked)
-            {
-                cbxStreamVisible.Checked = true;
-            }
-        }
-
-        private void CbxStreamVisible_CheckedChanged(object sender, EventArgs e)
-        {
-            if (!cbxStreamVisible.Checked && !cbxRecordingVisible.Checked)
-            {
-                cbxRecordingVisible.Checked = true;
-            }
-        }*/
 
         protected void PopulateScenes()
         {

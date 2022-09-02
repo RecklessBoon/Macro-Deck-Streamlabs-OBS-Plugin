@@ -14,11 +14,15 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
         public JsonRpcResponse Response { get; set; }
     }
 
-    public class MessageDispatcher
+    public class MessageDispatcher: IDisposable
     {
-        public event EventHandler<MessageDispatchedArgs> OnMessageDispatched;
-        public event EventHandler<MessageDispatchedArgs> OnEventDispatched;
-        public event EventHandler<MessageDispatchedArgs> OnErrorDispatched;
+        public event EventHandler<MessageDispatchedArgs> MessageDispatched;
+        public event EventHandler<MessageDispatchedArgs> EventDispatched;
+        public event EventHandler<MessageDispatchedArgs> ErrorDispatched;
+        public event EventHandler<EventArgs> Disposed;
+
+        protected bool _isDisposed = false;
+        public bool IsDisposed { get => _isDisposed; }
 
         protected int _requestCount = 0;
         protected RPCConnection _connection;
@@ -32,13 +36,15 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
             _joinableTaskContext = new JoinableTaskContext();
             _joinableTaskFactory = new JoinableTaskFactory(_joinableTaskContext);
             _connection = connection;
-            _connection.OnMessageReceived += DispatchMessage;
+            _connection.MessageReceived += DispatchMessage;
         }
 
         public void Notify(JsonRpcRequest request) => _joinableTaskFactory.Run(async () => await NotifyAsync(request));
 
         public async Task NotifyAsync(JsonRpcRequest request)
         {
+            if (IsDisposed || _connection.IsDisposed) return;
+
             request.Id ??= (_requestCount++).ToString();
             await _connection.NotifyAsync(request);
         }
@@ -47,6 +53,8 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
 
         public async Task<JsonRpcResponse> WriteAsync(JsonRpcRequest request)
         {
+            if (IsDisposed || _connection.IsDisposed) return null;
+
             request.Id ??= (_requestCount++).ToString();
             return await _connection.WriteAsync(request);
         }
@@ -55,10 +63,12 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
 
         public void Subscribe(string event_service, string event_name, EventHandler callback)
         {
+            if (IsDisposed || _connection.IsDisposed) return;
+
             var emitter = String.Format("{0}.{1}", event_service, event_name);
             if (!handlers.ContainsKey(emitter))
             {
-                PluginCache.Dispatcher.Notify(new JsonRpcRequest
+                Notify(new JsonRpcRequest
                 {
                     Method = event_name,
                     Params = new
@@ -79,16 +89,18 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
                 }
             };
             handlers[emitter].Add(handler);
-            PluginCache.Dispatcher.OnEventDispatched -= handler;
-            PluginCache.Dispatcher.OnEventDispatched += handler;
+            EventDispatched -= handler;
+            EventDispatched += handler;
         }
 
         public void Subscribe<T>(string event_service, string event_name, EventHandler<T> callback)
         {
+            if (IsDisposed || _connection.IsDisposed) return;
+
             var emitter = String.Format("{0}.{1}", event_service, event_name);
             if (!handlers.ContainsKey(emitter))
             {
-                PluginCache.Dispatcher.Notify(new JsonRpcRequest
+                Notify(new JsonRpcRequest
                 {
                     Method = event_name,
                     Params = new
@@ -110,22 +122,24 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
                 }
             };
             handlers[emitter].Add(handler);
-            PluginCache.Dispatcher.OnEventDispatched -= handler;
-            PluginCache.Dispatcher.OnEventDispatched += handler;
+            EventDispatched -= handler;
+            EventDispatched += handler;
         }
 
         public void Unsubscribe(string event_service, string event_name)
         {
+            if (IsDisposed || _connection.IsDisposed) return;
+
             var emitter = String.Format("{0}.{1}", event_service, event_name);
 
             var handler_list = handlers[emitter];
             foreach (var handler in handler_list)
             {
-                PluginCache.Dispatcher.OnEventDispatched -= handler;
+                EventDispatched -= handler;
             }
 
             handlers.Remove(emitter);
-            PluginCache.Dispatcher.Notify(new JsonRpcRequest
+            Notify(new JsonRpcRequest
             {
                 Method = "unsubscribe",
                 Params = new
@@ -137,18 +151,29 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
 
         private void DispatchMessage(object sender, MessageReceivedArgs e)
         {
+            if (IsDisposed) return;
+
             if (e.Message.Error != null)
             {
-                OnErrorDispatched?.Invoke(this, new MessageDispatchedArgs { Type = MessageType.ErrorThrown, Response = e.Message });
+                ErrorDispatched?.Invoke(this, new MessageDispatchedArgs { Type = MessageType.ErrorThrown, Response = e.Message });
             }
             else if (e.Message.Id == null)
             {
-                OnEventDispatched?.Invoke(this, new MessageDispatchedArgs { Type = MessageType.EventDispatch, Response = e.Message });
+                EventDispatched?.Invoke(this, new MessageDispatchedArgs { Type = MessageType.EventDispatch, Response = e.Message });
             }
             else
             {
-                OnMessageDispatched?.Invoke(this, new MessageDispatchedArgs { Type = MessageType.RequestResponse, Response = e.Message });
+                MessageDispatched?.Invoke(this, new MessageDispatchedArgs { Type = MessageType.RequestResponse, Response = e.Message });
             }
+        }
+
+        public void Dispose()
+        {
+            _isDisposed = true;
+            MessageDispatched = default;
+            EventDispatched = default;
+            ErrorDispatched = default;
+            Disposed?.Invoke(this, EventArgs.Empty);
         }
     }
 }

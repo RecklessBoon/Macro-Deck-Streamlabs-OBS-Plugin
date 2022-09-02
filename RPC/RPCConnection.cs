@@ -32,8 +32,8 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC
 
     public class RPCConnection : IDisposable
     {
-        public event EventHandler<MessageReceivedArgs> OnMessageReceived;
-        public event EventHandler OnDisposed;
+        public event EventHandler<MessageReceivedArgs> MessageReceived;
+        public event EventHandler Disposed;
 
         protected CancellationTokenSource cts;
         protected TaskCompletionSource<bool> _completionSource = default;
@@ -66,7 +66,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC
             _completionSource = new TaskCompletionSource<bool>();
         }
 
-        public void Start()
+        public bool Start()
         {
             _started = true;
             _ = Task.Run(async () =>
@@ -82,6 +82,8 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC
                 _completionSource.SetResult(true);
 
             });
+
+            return IsStarted;
         }
 
         public void Notify(JsonRpcRequest request) => _joinableTaskFactory.Run(async () => await NotifyAsync(request));
@@ -102,23 +104,23 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC
                     if (response.Id == request.Id)
                     {
                         tcs.SetResult(response);
-                        this.OnMessageReceived -= Watcher;
+                        this.MessageReceived -= Watcher;
                     }
                 } 
                 catch (Exception jse)
                 {
                     Console.WriteLine("Weird serialization error: {0}", jse);
-                    this.OnMessageReceived -= Watcher;
+                    this.MessageReceived -= Watcher;
                 }
             };
-            this.OnMessageReceived += Watcher;
+            this.MessageReceived += Watcher;
 
             _ = Task.Run(async () =>
             {
                 await Task.Delay(120000);
                 if (!tcs.Task.IsCompleted)
                 {
-                    this.OnMessageReceived -= Watcher;
+                    this.MessageReceived -= Watcher;
                     tcs.SetException(new TimeoutException("No response given within 2 minutes. Abandonning watcher"));
                 }
             });
@@ -153,7 +155,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC
                                 foreach (var message in response.Split("\r\n"))
                                 {
                                     if (message == "") continue;
-                                    OnMessageReceived?.Invoke(this, new MessageReceivedArgs { RawMessage = message.Replace("\\n", "\n") });
+                                    MessageReceived?.Invoke(this, new MessageReceivedArgs { RawMessage = message.Replace("\\n", "\n") });
                                 }
                             }
                         }
@@ -218,7 +220,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC
             cts.Cancel();
 
             _disposed = true;
-            OnDisposed?.Invoke(this, EventArgs.Empty);
+            Disposed?.Invoke(this, EventArgs.Empty);
         }
     }
 }

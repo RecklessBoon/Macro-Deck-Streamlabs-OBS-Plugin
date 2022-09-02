@@ -35,7 +35,9 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
         // Gets called when the action is triggered by a button press or an event
         public override void Trigger(string clientId, ActionButton actionButton)
         {
-            if (PluginCache.SceneCollectionsService.GetType() != typeof(SceneCollectionsService)) return;
+            if (PluginCache.Client.IsDisposed ||
+                !PluginCache.Client.IsStarted ||
+                PluginCache.SceneCollectionsService.GetType() != typeof(SceneCollectionsService)) return;
 
             var config = JsonConvert.DeserializeObject<SwitchCollectionActionConfig>(Configuration);
             if (!config.CollectionId.Equals(string.Empty) && PluginCache.ActiveCollection?.Id != config.CollectionId)

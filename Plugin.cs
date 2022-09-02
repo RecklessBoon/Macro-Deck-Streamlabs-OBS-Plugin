@@ -2,32 +2,66 @@
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.RPC;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services;
+using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Dialog;
 using Streamlabs_OBS_Plugin.Services;
+using SuchByte.MacroDeck.GUI;
+using SuchByte.MacroDeck.GUI.CustomControls;
 using SuchByte.MacroDeck.Plugins;
 using SuchByte.MacroDeck.Variables;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO.Pipes;
+using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Windows.Input;
 
 namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
 {
     public class Plugin : MacroDeckPlugin
     {
+        public event EventHandler<EventArgs> OnInit;
+
         public override bool CanConfigure => false;
 
         public Plugin()
         {
             PluginCache.Plugin = this;
+            SuchByte.MacroDeck.MacroDeck.OnMainWindowLoad += MainWindowHelper.MacroDeck_OnMainWindowLoad;
+            MainWindowHelper.StatusButtonClicked += (o, e) =>
+            {
+                try
+                {
+                    _ = Task.Run(() =>
+                    {
+                        var RPCClient = PluginCache.Client;
+                        if (RPCClient != null && !RPCClient.IsDisposed)
+                        {
+                            StopClient();
+                        }
+                        else if (RPCClient == null || RPCClient.IsDisposed || !RPCClient.IsStarted)
+                        {
+                            InitClient();
+                            StartClient();
+                        }
+                    });
+                }
+                catch (Exception ex)
+                {
+                    AppLogger.Error("Unexpected Exception:\n{0}", ex);
+                }
+            };
         }
 
         public override void Enable()
         {
-            // Do plugin initialization here
-            _ = InitClientAsync();
+            VariableManager.SetValue("slobs_connected", false, VariableType.Bool, PluginCache.Plugin, true);
 
+            // Do plugin initialization here
             this.Actions = new List<PluginAction> {
                 new SwitchCollectionAction(),
                 new SwitchSceneAction(),
@@ -40,6 +74,9 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
                 new SetSceneItemSettingsAction(),
                 new SetSourcePropertiesAction()
             };
+
+            InitClient();
+            StartClient();
         }
 
         public override void OpenConfigurator()
@@ -50,46 +87,69 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
             }
         }
 
-        protected async Task InitClientAsync()
+        public Client InitClient()
         {
-            if (PluginCache.Connection == null)
+            var client = PluginCache.Client;
+            if (client == null || client.IsDisposed)
             {
-                var pipe = new NamedPipeClientStream(".", "slobs", PipeDirection.InOut, PipeOptions.Asynchronous);
-                await pipe.ConnectAsync();
-                PluginCache.Pipe = pipe;
-                var connection = new RPCConnection(pipe);
-                var dispatcher = new MessageDispatcher(connection);
-                connection.OnDisposed += OnConnectionDisposed;
-                PluginCache.Connection = connection;
-                PluginCache.Dispatcher = new MessageDispatcher(connection);
+                client = new Client();
+                PluginCache.Client = client;
                 PluginCache.ScenesService = new ScenesService();
                 PluginCache.SceneCollectionsService = new SceneCollectionsService();
                 PluginCache.StreamingService = new StreamingService();
                 PluginCache.AudioService = new AudioService();
                 PluginCache.SourcesService = new SourcesService();
-                connection.Start();
-                WireListeners();
-                var collection = await PluginCache.SceneCollectionsService.ActiveCollectionAsync();
-                OnCollectionSwitched(this, collection);
-                PluginCache.CollectionSchemas = await PluginCache.SceneCollectionsService.FetchSceneCollectionsSchemaAsync();
-                PluginCache.AudioSources = await PluginCache.AudioService.GetSourcesAsync();
-
+                OnInit?.Invoke(this, EventArgs.Empty);
             }
+
+            return client;
+        }
+
+        public void StartClient()
+        {
+            var client = PluginCache.Client;
+
+            client.Dispatcher.ErrorDispatched += (o, e) =>
+            {
+                StopClient();
+            };
+            client.Started += (object sender, EventArgs e) =>
+            {
+                MainWindowHelper.CancelConnectingStatusLoop();
+                MainWindowHelper.UpdateStatusButton(client.IsStarted);
+                VariableManager.SetValue("slobs_connected", client.IsStarted, VariableType.Bool, PluginCache.Plugin, true);
+                WireListeners();
+                _ = Task.Run(async () =>
+                {
+                    var collection = await PluginCache.SceneCollectionsService.ActiveCollectionAsync();
+                    OnCollectionSwitched(this, collection);
+                    PluginCache.CollectionSchemas = await PluginCache.SceneCollectionsService.FetchSceneCollectionsSchemaAsync();
+                    PluginCache.AudioSources = await PluginCache.AudioService.GetSourcesAsync();
+                });
+            };
+            client.Disposed += (object sender, EventArgs e) =>
+            {
+                VariableManager.SetValue("slobs_connected", client.IsStarted, VariableType.Bool, PluginCache.Plugin, true);
+                ClipListeners();
+                MainWindowHelper.UpdateStatusButton(client.IsStarted);
+            };
+
+            MainWindowHelper.StartStatusLoopAsync();
+            _ = client.StartAsync();
+        }
+
+        public void StopClient()
+        {
+            PluginCache.Client.Dispose();
         }
 
         protected void WireListeners()
         {
-            PluginCache.Dispatcher.OnErrorDispatched += OnErrorDispatched;
             PluginCache.ScenesService.SceneSwitched += OnSceneSwitched;
             PluginCache.SceneCollectionsService.CollectionSwitched += OnCollectionSwitched;
             PluginCache.StreamingService.StreamingStatusChange += OnStreamingStatusChanged;
             PluginCache.StreamingService.RecordingStatusChange += OnRecordingStatusChanged;
             PluginCache.StreamingService.ReplayBufferStatusChange += OnReplayBufferStatusChanged;
-        }
-
-        private void OnErrorDispatched(object sender, MessageDispatchedArgs e)
-        {
-            AppLogger.Error("Invalid response received: {0}", e.Response);
         }
 
         protected void ClipListeners()
@@ -140,24 +200,12 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
                 OnSceneSwitched(this, scene);
             });
         }
-
-        protected void OnConnectionDisposed(object sender, EventArgs args)
-        {
-            if (!PluginCache.Pipe.IsConnected)
-            {
-                PluginCache.Pipe.Dispose();
-            }
-
-            ClipListeners();
-        }
     }
 
     public static class PluginCache
     {
         public static Plugin Plugin { get; set; }
-        public static NamedPipeClientStream Pipe { get; set; }
-        public static RPCConnection Connection { get; set; }
-        public static MessageDispatcher Dispatcher { get; set; }
+        public static Client Client { get; set; }
 
         public static ScenesService ScenesService { get; set; }
         public static SceneCollectionsService SceneCollectionsService { get; set; }

@@ -79,5 +79,35 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap streamlabs_app_icon {
+            get {
+                object obj = ResourceManager.GetObject("streamlabs_app_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap streamlabs_app_icon_64x64 {
+            get {
+                object obj = ResourceManager.GetObject("streamlabs_app_icon_64x64", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap streamlabs_app_icon_gray_64x64 {
+            get {
+                object obj = ResourceManager.GetObject("streamlabs_app_icon_gray_64x64", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

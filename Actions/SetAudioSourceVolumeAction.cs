@@ -37,7 +37,9 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
         // Gets called when the action is triggered by a button press or an event
         public override void Trigger(string clientId, ActionButton actionButton)
         {
-            if (PluginCache.AudioService.GetType() != typeof(AudioService)) return;
+            if (PluginCache.Client.IsDisposed ||
+                !PluginCache.Client.IsStarted ||
+                PluginCache.AudioService.GetType() != typeof(AudioService)) return;
 
             var config = JsonConvert.DeserializeObject<SetAudioSourceVolumeActionConfig>(Configuration);
             if (!config.SourceId.Equals(string.Empty) && config.Deflection != null)
@@ -45,6 +47,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
                 _ = Task.Run(async () =>
                 {
                     var source = await PluginCache.AudioService.GetSourceAsync(config.SourceId);
+                    if (source == null) return;
                     await source.SetDeflectionAsync(config.Deflection ?? 0);
                 });
             }

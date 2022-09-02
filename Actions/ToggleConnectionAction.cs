@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls;
 using Streamlabs_OBS_Plugin.Services;
 using SuchByte.MacroDeck.ActionButton;
@@ -9,39 +10,39 @@ using System.Threading.Tasks;
 
 namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
 {
-    public class SwitchSceneActionConfig
-    {
-        public string SceneId { get; set; }
-    }
-
-    public class SwitchSceneAction : PluginAction
+    public class ToggleConnectionAction : PluginAction
     {
         // The name of the action
-        public override string Name => "Switch Scene";
+        public override string Name => "Toggle SLOBS Connection";
 
         // A short description what the action can do
-        public override string Description => "Switch scene within the current site collection";
+        public override string Description => "Connect/Disconnect with the Streamlabs Desktop client";
 
         // Optional; Add if this action can be configured. This will make the ActionConfigurator calling GetActionConfigurator();
-        public override bool CanConfigure => true;
+        public override bool CanConfigure => false;
 
         // Optional; Add if you added CanConfigure; Gets called when the action can be configured and the action got selected in the ActionSelector. You need to return a user control with the "ActionConfigControl" class as base class
         public override ActionConfigControl GetActionConfigControl(ActionConfigurator actionConfigurator)
         {
-            return new SwitchSceneActionConfigurator(this, actionConfigurator);
+            return null;
         }
 
         // Gets called when the action is triggered by a button press or an event
         public override void Trigger(string clientId, ActionButton actionButton)
         {
-            if (PluginCache.Client.IsDisposed ||
-                !PluginCache.Client.IsStarted ||
-                PluginCache.ScenesService.GetType() != typeof(ScenesService)) return;
+            var client = PluginCache.Client;
 
-            var config = JsonConvert.DeserializeObject<SwitchSceneActionConfig>(Configuration);
-            if (!config.SceneId.Equals(string.Empty) && PluginCache.ActiveScene?.Id != config.SceneId)
+            if (client == null || client.IsDisposed)
             {
-                _ = PluginCache.ScenesService.MakeSceneActiveAsync(config.SceneId);
+                PluginCache.Plugin.InitClient();
+                PluginCache.Plugin.StartClient();
+            } else if (client != null && !client.IsStarted)
+            {
+                PluginCache.Plugin.StartClient();
+            }
+            else
+            {
+                PluginCache.Plugin.StopClient();
             }
         }
 

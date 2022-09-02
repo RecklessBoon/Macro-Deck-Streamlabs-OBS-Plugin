@@ -18,6 +18,8 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
 
         public static async Task MakeCallAsync(string resource, object[] args = default, [CallerMemberName] string method = "")
         {
+            if (PluginCache.Client?.Dispatcher == null || PluginCache.Client.IsDisposed || PluginCache.Client.Dispatcher.IsDisposed) return;
+
             object param_args = new
             {
                 resource
@@ -32,7 +34,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
                 };
             }
 
-            await PluginCache.Dispatcher.WriteAsync(new JsonRpcRequest
+            await PluginCache.Client.Dispatcher.WriteAsync(new JsonRpcRequest
             {
                 Method = FromPascalToCamelCase(method),
                 Params = param_args
@@ -43,6 +45,8 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
 
         public static async Task<T> MakeCallAsync<T>(string resource, object[] args = default, [CallerMemberName] string method = "")
         {
+            if (PluginCache.Client?.Dispatcher == null || PluginCache.Client.IsDisposed || PluginCache.Client.Dispatcher.IsDisposed) return default;
+
             object param_args = new
             {
                 resource
@@ -57,7 +61,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
                 };
             };
 
-            var response = await PluginCache.Dispatcher.WriteAsync(new JsonRpcRequest
+            var response = await PluginCache.Client.Dispatcher.WriteAsync(new JsonRpcRequest
             {
                 Method = FromPascalToCamelCase(method),
                 Params = param_args
@@ -101,7 +105,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
                         }
                     };
 
-                    PluginCache.Dispatcher.OnEventDispatched += handler;
+                    PluginCache.Client.Dispatcher.EventDispatched += handler;
                     return await tcs.Task;
                 }
                 else
@@ -117,22 +121,26 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Services
 
         protected void AddSubscriber(EventHandler handler, [CallerMemberName] string propertyName = "")
         {
-            PluginCache.Dispatcher.Subscribe(this.GetType().Name, FromPascalToCamelCase(propertyName), handler);
+            if (PluginCache.Client?.Dispatcher == null || PluginCache.Client.IsDisposed || PluginCache.Client.Dispatcher.IsDisposed) return;
+            PluginCache.Client.Dispatcher.Subscribe(this.GetType().Name, FromPascalToCamelCase(propertyName), handler);
         }
 
         protected void RemoveSubscriber(EventHandler handler, [CallerMemberName] string propertyName = "")
         {
-            PluginCache.Dispatcher.Unsubscribe(this.GetType().Name, FromPascalToCamelCase(propertyName));
+            if (PluginCache.Client?.Dispatcher == null || PluginCache.Client.IsDisposed || PluginCache.Client.Dispatcher.IsDisposed) return;
+            PluginCache.Client.Dispatcher.Unsubscribe(this.GetType().Name, FromPascalToCamelCase(propertyName));
         }
 
         protected void AddSubscriber<T>(EventHandler<T> handler, [CallerMemberName] string propertyName = "")
         {
-            PluginCache.Dispatcher.Subscribe(this.GetType().Name, FromPascalToCamelCase(propertyName), handler);
+            if (PluginCache.Client?.Dispatcher == null || PluginCache.Client.IsDisposed || PluginCache.Client.Dispatcher.IsDisposed) return;
+            PluginCache.Client.Dispatcher.Subscribe(this.GetType().Name, FromPascalToCamelCase(propertyName), handler);
         }
 
         protected void RemoveSubscriber<T>(EventHandler<T> handler, [CallerMemberName] string propertyName = "")
         {
-            PluginCache.Dispatcher.Unsubscribe(this.GetType().Name, FromPascalToCamelCase(propertyName));
+            if (PluginCache.Client?.Dispatcher == null || PluginCache.Client.IsDisposed || PluginCache.Client.Dispatcher.IsDisposed) return;
+            PluginCache.Client.Dispatcher.Unsubscribe(this.GetType().Name, FromPascalToCamelCase(propertyName));
         }
     }
 }

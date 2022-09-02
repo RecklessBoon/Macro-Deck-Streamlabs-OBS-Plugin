@@ -40,7 +40,8 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
         // Gets called when the action is triggered by a button press or an event
         public override void Trigger(string clientId, ActionButton actionButton)
         {
-            if (PluginCache.SourcesService.GetType() != typeof(SourcesService)) return;
+            if (PluginCache.Client.IsDisposed || !PluginCache.Client.IsStarted ||
+                PluginCache.SourcesService.GetType() != typeof(SourcesService)) return;
 
             var config = JsonConvert.DeserializeObject<SetSourcePropertiesActionConfig>(Configuration);
             if (config.Source == default(Source) || config.FormData.Equals(string.Empty)) return;
