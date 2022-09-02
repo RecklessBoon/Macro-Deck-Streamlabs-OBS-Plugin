@@ -6,13 +6,14 @@
         <Author>RecklessBoon</Author>
         <RootNamespace>RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin</RootNamespace>
         <PackageId>RecklessBoon.MacroDeck.StreamlabsOBSPlugin</PackageId>
-        <AssemblyName>Streamlabs OBS Plugin</AssemblyName>
+        <AssemblyName>Streamlabs_OBS_Plugin</AssemblyName>
         <RepositoryUrl></RepositoryUrl>
         <UseWindowsForms>True</UseWindowsForms>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <Platforms>AnyCPU;x64</Platforms>
+        <Title>Streamlabs OBS Plugin</Title>
     </PropertyGroup>
 
     <ItemGroup>

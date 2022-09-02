@@ -4,7 +4,7 @@
   "author": "RecklessBoon",
   "repository": "https://github.com/RecklessBoon/Macro-Deck-Streamlabs-OBS-Plugin",
   "packageId": "RecklessBoon.MacroDeck.StreamlabsOBSPlugin",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "target-plugin-api-version": 36,
-  "dll": "Streamlabs_OBS_Plugin.dll"
+  "dll": "Streamlabs OBS Plugin.dll"
 }
