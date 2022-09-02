@@ -2,17 +2,13 @@
 using Newtonsoft.Json.Linq;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions;
 using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model;
-using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Model.OBS.Property;
-using RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls.OBS;
 using SuchByte.MacroDeck.GUI;
 using SuchByte.MacroDeck.GUI.CustomControls;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using System.Windows.Forms;
 
 namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls
@@ -121,13 +117,14 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls
             }
             else
             {
-                table.Controls.Add(new TextBox { 
-                    Text = value.ToString(), 
-                    AutoSize = true, 
-                    Dock = DockStyle.Fill, 
-                    Margin = new Padding(0, 6, 0, 6), 
-                    ReadOnly = true, 
-                    BorderStyle = BorderStyle.None, 
+                table.Controls.Add(new TextBox
+                {
+                    Text = value.ToString(),
+                    AutoSize = true,
+                    Dock = DockStyle.Fill,
+                    Margin = new Padding(0, 6, 0, 6),
+                    ReadOnly = true,
+                    BorderStyle = BorderStyle.None,
                     BackColor = System.Drawing.Color.FromArgb(255, 45, 45, 45),
                     ForeColor = System.Drawing.Color.White,
                     Font = new System.Drawing.Font(TextBox.DefaultFont.FontFamily, 12)
@@ -137,8 +134,9 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.UI.Controls
 
         private void PopulateProperties(JObject settings)
         {
-            
-            tblSourceStateContainer.InvokeIfRequired(tbl => {
+
+            tblSourceStateContainer.InvokeIfRequired(tbl =>
+            {
                 DrawingHelper.BeginControlUpdate(tbl);
                 tbl.Controls.Clear();
                 DrawingHelper.BeginControlUpdate(tbl);
