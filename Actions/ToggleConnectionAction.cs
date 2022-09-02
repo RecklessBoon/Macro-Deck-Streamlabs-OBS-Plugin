@@ -13,10 +13,10 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
     public class ToggleConnectionAction : PluginAction
     {
         // The name of the action
-        public override string Name => "Toggle SLOBS Connection";
+        public override string Name => "Toggle Connection";
 
         // A short description what the action can do
-        public override string Description => "Connect/Disconnect with the Streamlabs Desktop client";
+        public override string Description => "Connect/Disconnect with the Streamlabs OBS Desktop client";
 
         // Optional; Add if this action can be configured. This will make the ActionConfigurator calling GetActionConfigurator();
         public override bool CanConfigure => false;

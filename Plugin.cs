@@ -57,12 +57,28 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
             };
         }
 
+        private void InitVariables()
+        {
+            VariableManager.SetValue("slobs_connected", false, VariableType.Bool, PluginCache.Plugin, false);
+            VariableManager.SetValue("slobs_replay_buffer_state", string.Empty, VariableType.String, PluginCache.Plugin, false);
+            VariableManager.SetValue("slobs_replay_buffer", false, VariableType.Bool, PluginCache.Plugin, false);
+            VariableManager.SetValue("slobs_recording_status", string.Empty, VariableType.String, PluginCache.Plugin, false);
+            VariableManager.SetValue("slobs_recording", false, VariableType.Bool, PluginCache.Plugin, false);
+            VariableManager.SetValue("slobs_streaming_status", string.Empty, VariableType.String, PluginCache.Plugin, false);
+            VariableManager.SetValue("slobs_streaming", false, VariableType.String, PluginCache.Plugin, false);
+            VariableManager.SetValue("slobs_active_scene_name", string.Empty, VariableType.String, PluginCache.Plugin, false);
+            VariableManager.SetValue("slobs_active_scene_id", string.Empty, VariableType.String, PluginCache.Plugin, false);
+            VariableManager.SetValue("slobs_active_scene_collection_name", string.Empty, VariableType.String, PluginCache.Plugin, false);
+            VariableManager.SetValue("slobs_active_scene_collection_id", string.Empty, VariableType.String, PluginCache.Plugin, true);
+        }
+
         public override void Enable()
         {
-            VariableManager.SetValue("slobs_connected", false, VariableType.Bool, PluginCache.Plugin, true);
+            InitVariables();
 
             // Do plugin initialization here
             this.Actions = new List<PluginAction> {
+                new ToggleConnectionAction(),
                 new SwitchCollectionAction(),
                 new SwitchSceneAction(),
                 new SetStreamingStateAction(),
@@ -175,7 +191,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
         {
             PluginCache.StreamingState = state;
             VariableManager.SetValue("slobs_streaming_status", state, VariableType.String, PluginCache.Plugin, null);
-            VariableManager.SetValue("slobs_recording", (state != EStreamingState.OFFLINE), VariableType.String, PluginCache.Plugin, null);
+            VariableManager.SetValue("slobs_streaming", (state != EStreamingState.OFFLINE), VariableType.String, PluginCache.Plugin, null);
         }
 
         protected void OnSceneSwitched(object sender, ISceneModel scene)

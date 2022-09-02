@@ -58,7 +58,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
         public override string Name => "Update Scene Item Settings";
 
         // A short description what the action can do
-        public override string Description => "Set scene item settings";
+        public override string Description => "Set scene item settings (Visibility)";
 
         // Optional; Add if this action can be configured. This will make the ActionConfigurator calling GetActionConfigurator();
         public override bool CanConfigure => true;

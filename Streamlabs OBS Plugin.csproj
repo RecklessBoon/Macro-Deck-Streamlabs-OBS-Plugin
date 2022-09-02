@@ -16,7 +16,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Cyotek.Windows.Forms.ColorPicker" Version="1.7.2" />
         <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.2.32" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="System.Collections" Version="4.3.0" />
