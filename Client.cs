@@ -30,16 +30,6 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
         protected CancellationTokenSource cts;
         protected TaskCompletionSource<bool> _completionSource = default;
 
-        public Client()
-        {
-            _pipe = new NamedPipeClientStream(".", "slobs", PipeDirection.InOut, PipeOptions.Asynchronous);
-            _connection = new RPCConnection(Pipe);
-            _dispatcher = new MessageDispatcher(Connection);
-            Connection.Disposed += Connection_OnDisposed;
-            Dispatcher.Disposed += Dispatcher_OnDisposed;
-            Dispatcher.ErrorDispatched += Dispatcher_OnErrorDispatched;
-        }
-
         public async Task<bool> StartAsync()
         {
             _pipe = new NamedPipeClientStream(".", "slobs", PipeDirection.InOut, PipeOptions.Asynchronous);

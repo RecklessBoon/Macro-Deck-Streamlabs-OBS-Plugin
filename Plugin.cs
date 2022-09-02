@@ -109,10 +109,6 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
         {
             var client = PluginCache.Client;
 
-            client.Dispatcher.ErrorDispatched += (o, e) =>
-            {
-                StopClient();
-            };
             client.Started += (object sender, EventArgs e) =>
             {
                 MainWindowHelper.CancelConnectingStatusLoop();
