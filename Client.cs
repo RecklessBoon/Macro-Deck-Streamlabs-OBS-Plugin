@@ -87,7 +87,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
             {
                 _isStarted = false;
                 _isDisposed = true;
-                VariableManager.SetValue("slobs_connected", false, VariableType.Bool, PluginCache.Plugin, true);
+                VariableManager.SetValue("slobs_connected", false, VariableType.Bool, PluginCache.Plugin);
                 Pipe?.Dispose();
                 Connection?.Dispose();
                 Dispatcher?.Dispose();

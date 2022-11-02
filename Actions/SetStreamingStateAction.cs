@@ -27,6 +27,8 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
 
     public class SetStreamingStateAction : PluginAction
     {
+        public override string BindableVariable => "slobs_streaming";
+
         // The name of the action
         public override string Name => "Set Streaming State";
 

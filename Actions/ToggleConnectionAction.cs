@@ -12,6 +12,8 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
 {
     public class ToggleConnectionAction : PluginAction
     {
+        public override string BindableVariable => "slobs_connected";
+
         // The name of the action
         public override string Name => "Toggle Connection";
 

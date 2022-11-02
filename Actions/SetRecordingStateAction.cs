@@ -27,6 +27,8 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
 
     public class SetRecordingStateAction : PluginAction
     {
+        public override string BindableVariable => "slobs_recording";
+
         // The name of the action
         public override string Name => "Set Recording State";
 

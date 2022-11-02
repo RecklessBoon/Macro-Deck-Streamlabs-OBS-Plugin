@@ -59,17 +59,17 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
 
         private void InitVariables()
         {
-            VariableManager.SetValue("slobs_connected", false, VariableType.Bool, PluginCache.Plugin, false);
-            VariableManager.SetValue("slobs_replay_buffer_state", string.Empty, VariableType.String, PluginCache.Plugin, false);
-            VariableManager.SetValue("slobs_replay_buffer", false, VariableType.Bool, PluginCache.Plugin, false);
-            VariableManager.SetValue("slobs_recording_status", string.Empty, VariableType.String, PluginCache.Plugin, false);
-            VariableManager.SetValue("slobs_recording", false, VariableType.Bool, PluginCache.Plugin, false);
-            VariableManager.SetValue("slobs_streaming_status", string.Empty, VariableType.String, PluginCache.Plugin, false);
-            VariableManager.SetValue("slobs_streaming", false, VariableType.String, PluginCache.Plugin, false);
-            VariableManager.SetValue("slobs_active_scene_name", string.Empty, VariableType.String, PluginCache.Plugin, false);
-            VariableManager.SetValue("slobs_active_scene_id", string.Empty, VariableType.String, PluginCache.Plugin, false);
-            VariableManager.SetValue("slobs_active_scene_collection_name", string.Empty, VariableType.String, PluginCache.Plugin, false);
-            VariableManager.SetValue("slobs_active_scene_collection_id", string.Empty, VariableType.String, PluginCache.Plugin, true);
+            VariableManager.SetValue("slobs_connected", false, VariableType.Bool, PluginCache.Plugin);
+            VariableManager.SetValue("slobs_replay_buffer_state", string.Empty, VariableType.String, PluginCache.Plugin);
+            VariableManager.SetValue("slobs_replay_buffer", false, VariableType.Bool, PluginCache.Plugin);
+            VariableManager.SetValue("slobs_recording_status", string.Empty, VariableType.String, PluginCache.Plugin);
+            VariableManager.SetValue("slobs_recording", false, VariableType.Bool, PluginCache.Plugin);
+            VariableManager.SetValue("slobs_streaming_status", string.Empty, VariableType.String, PluginCache.Plugin);
+            VariableManager.SetValue("slobs_streaming", false, VariableType.String, PluginCache.Plugin);
+            VariableManager.SetValue("slobs_active_scene_name", string.Empty, VariableType.String, PluginCache.Plugin);
+            VariableManager.SetValue("slobs_active_scene_id", string.Empty, VariableType.String, PluginCache.Plugin);
+            VariableManager.SetValue("slobs_active_scene_collection_name", string.Empty, VariableType.String, PluginCache.Plugin);
+            VariableManager.SetValue("slobs_active_scene_collection_id", string.Empty, VariableType.String, PluginCache.Plugin);
         }
 
         public override void Enable()
@@ -129,7 +129,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
             {
                 MainWindowHelper.CancelConnectingStatusLoop();
                 MainWindowHelper.UpdateStatusButton(client.IsStarted);
-                VariableManager.SetValue("slobs_connected", client.IsStarted, VariableType.Bool, PluginCache.Plugin, true);
+                VariableManager.SetValue("slobs_connected", client.IsStarted, VariableType.Bool, PluginCache.Plugin);
                 WireListeners();
                 _ = Task.Run(async () =>
                 {
@@ -141,7 +141,7 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
             };
             client.Disposed += (object sender, EventArgs e) =>
             {
-                VariableManager.SetValue("slobs_connected", client.IsStarted, VariableType.Bool, PluginCache.Plugin, true);
+                VariableManager.SetValue("slobs_connected", client.IsStarted, VariableType.Bool, PluginCache.Plugin);
                 ClipListeners();
                 MainWindowHelper.UpdateStatusButton(client.IsStarted);
             };
@@ -176,36 +176,36 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin
         private void OnReplayBufferStatusChanged(object sender, EReplayBufferState state)
         {
             PluginCache.ReplayBufferState = state;
-            VariableManager.SetValue("slobs_replay_buffer_status", state, VariableType.String, PluginCache.Plugin, null);
-            VariableManager.SetValue("slobs_replay_buffer", (state != EReplayBufferState.OFFLINE), VariableType.Bool, PluginCache.Plugin, null);
+            VariableManager.SetValue("slobs_replay_buffer_status", state, VariableType.String, PluginCache.Plugin);
+            VariableManager.SetValue("slobs_replay_buffer", (state != EReplayBufferState.OFFLINE), VariableType.Bool, PluginCache.Plugin);
         }
 
         private void OnRecordingStatusChanged(object sender, ERecordingState state)
         {
             PluginCache.RecordingState = state;
-            VariableManager.SetValue("slobs_recording_status", state, VariableType.String, PluginCache.Plugin, null);
-            VariableManager.SetValue("slobs_recording", (state != ERecordingState.OFFLINE), VariableType.String, PluginCache.Plugin, null);
+            VariableManager.SetValue("slobs_recording_status", state, VariableType.String, PluginCache.Plugin);
+            VariableManager.SetValue("slobs_recording", (state != ERecordingState.OFFLINE), VariableType.String, PluginCache.Plugin);
         }
 
         private void OnStreamingStatusChanged(object sender, EStreamingState state)
         {
             PluginCache.StreamingState = state;
-            VariableManager.SetValue("slobs_streaming_status", state, VariableType.String, PluginCache.Plugin, null);
-            VariableManager.SetValue("slobs_streaming", (state != EStreamingState.OFFLINE), VariableType.String, PluginCache.Plugin, null);
+            VariableManager.SetValue("slobs_streaming_status", state, VariableType.String, PluginCache.Plugin);
+            VariableManager.SetValue("slobs_streaming", (state != EStreamingState.OFFLINE), VariableType.String, PluginCache.Plugin);
         }
 
         protected void OnSceneSwitched(object sender, ISceneModel scene)
         {
             PluginCache.ActiveScene = (Scene)scene;
-            VariableManager.SetValue("slobs_active_scene_name", scene.Name, VariableType.String, PluginCache.Plugin, null);
-            VariableManager.SetValue("slobs_active_scene_id", scene.Id, VariableType.String, PluginCache.Plugin, null);
+            VariableManager.SetValue("slobs_active_scene_name", scene.Name, VariableType.String, PluginCache.Plugin);
+            VariableManager.SetValue("slobs_active_scene_id", scene.Id, VariableType.String, PluginCache.Plugin);
         }
 
         protected void OnCollectionSwitched(object sender, SceneCollectionsManifestEntry collection)
         {
             PluginCache.ActiveCollection = collection;
-            VariableManager.SetValue("slobs_active_scene_collection_name", collection.Name, VariableType.String, PluginCache.Plugin, null);
-            VariableManager.SetValue("slobs_active_scene_collection_id", collection.Id, VariableType.String, PluginCache.Plugin, null);
+            VariableManager.SetValue("slobs_active_scene_collection_name", collection.Name, VariableType.String, PluginCache.Plugin);
+            VariableManager.SetValue("slobs_active_scene_collection_id", collection.Id, VariableType.String, PluginCache.Plugin);
             _ = Task.Run(async () =>
             {
                 var scene = await PluginCache.ScenesService.ActiveSceneAsync();

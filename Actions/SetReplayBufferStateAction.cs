@@ -27,6 +27,8 @@ namespace RecklessBoon.MacroDeck.Streamlabs_OBS_Plugin.Actions
 
     public class SetReplayBufferStateAction : PluginAction
     {
+        public override string BindableVariable => "slobs_replay_buffer";
+
         // The name of the action
         public override string Name => "Set Replay Buffer State";
 
