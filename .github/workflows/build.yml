@@ -21,6 +21,6 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - name: Build Extension
-      uses: RecklessBoon/Macro-Deck-Extension-Build-Action@main
+      uses: RecklessBoon/Macro-Deck-Extension-Build-Action@v1.0.5
       
     
